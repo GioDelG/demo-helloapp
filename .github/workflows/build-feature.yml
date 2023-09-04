@@ -22,10 +22,13 @@ jobs:
               with:
                 node-version: 16
             # Runs clean install of npm for automated environments
-            - run: npm ci
+            - name: Clean Install
+              run: npm ci
             # Run tests
-            - name: Ejecutar pruebas
+            - name: Execute Tests
               run: npm test
+            - name: Build project assest
+              run: npm run build
 
 # Automatic merge to develop branch
     # Execute only if the previos job ended succesfully
