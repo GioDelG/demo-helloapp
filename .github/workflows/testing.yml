@@ -18,14 +18,7 @@ jobs:
               with:
                 node-version: 16
             # Runs clean install of npm for automated environments
-            - run: npm install
+            - run: npm ci
             # Run tests
             - name: Ejecutar pruebas
               run: npm test
-            # Guardar artefacto
-            - uses: actions/upload-artifact@v3
-              if: always()
-              with:
-                name: test-report
-                path: test-report/
-                retention-days: 5
