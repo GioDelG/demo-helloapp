@@ -1,0 +1,31 @@
+name: Node.js Tests
+
+on:
+    pull_request:
+        branches: [master, main]
+
+jobs:
+    build:
+        # Define the platform to work in
+        runs-on: ubuntu-latest
+        
+        steps:
+            # Checkout your code into the container
+            - uses: actions/checkout@v2
+            # Setup node and npm to your path
+            - name: Use Node.js 
+              uses: actions/setup-node@v2
+              with:
+                node-version: 16
+            # Runs clean install of npm for automated environments
+            - run: npm install
+            # Run tests
+            - name: Ejecutar pruebas
+              run: npm test
+            # Guardar artefacto
+            - uses: actions/upload-artifact@v3
+              if: always()
+              with:
+                name: test-report
+                path: test-report/
+                retention-days: 5
