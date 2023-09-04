@@ -1,5 +1,3 @@
-build-feature.yml
-
 name: Build and Test Feature Branch
 
 on:
