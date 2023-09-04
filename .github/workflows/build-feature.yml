@@ -24,11 +24,13 @@ jobs:
             # Runs clean install of npm for automated environments
             - name: Clean Install
               run: npm ci
+            # Run Build
+            - name: Build project assest
+              run: npm run build
             # Run tests
             - name: Execute Tests
               run: npm test
-            - name: Build project assest
-              run: npm run build
+
               
 
 # Automatic merge to develop branch
