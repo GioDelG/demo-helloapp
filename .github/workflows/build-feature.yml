@@ -1,8 +1,11 @@
-name: Node.js Tests
+build-feature.yml
+
+name: Build and Test Feature Branch
 
 on:
-    pull_request:
-        branches: [master, main]
+  pull_request:
+      branches: [ develop ]
+      types: [ opened, reopened ]
 
 jobs:
     build:
@@ -12,6 +15,9 @@ jobs:
         steps:
             # Checkout your code into the container
             - uses: actions/checkout@v2
+              with:
+                # Making a pull_request on develop: Download the code from feature branch
+                ref: ${{ github.event.pull_request.head.sha }}
             # Setup node and npm to your path
             - name: Use Node.js 
               uses: actions/setup-node@v2
