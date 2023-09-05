@@ -1,4 +1,4 @@
-name: Publish dist dir as artifact 
+name: Publish dist as artifact 
 on:
   repository_dispatch:
     types: [publish-artifact-event]
@@ -12,21 +12,24 @@ jobs:
       contents: write
       pull-requests: write
       
-    steps:      
+    steps:
+      # Show the base branch from "build-feature" workflow for Debug pruposes      
       - name: Debug Payload
-# Show the base branch from "build-feature" workflow for Debug pruposes
         run: |     
          echo ${{ github.event.client_payload.base_branch }}
+
 # Download source code from default branch in order to retrive Dockerfile, and upload it as docker build context      
       - uses: actions/checkout@v3  
         with:
           # Get the base branch from build-feature workflow
           ref: ${{ github.event.client_payload.base_branch }}
           fetch-depth: 0
+
 # Show the two last commits of the branch for debug pruposes
       - name: check last hashid
         run: |
-          git log -2 
+          git log -2
+
 # Setup Node.js and check that the source code is buildable
       - name: Setup Node.js
         uses: actions/setup-node@v2
@@ -36,6 +39,7 @@ jobs:
         run: npm ci
       - name: Build Project
         run: npm run build
+        
 # Publish it as an artifact
       - name: Publish Dir Directory
         if: success()
