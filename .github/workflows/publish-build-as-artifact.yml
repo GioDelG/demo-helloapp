@@ -13,7 +13,7 @@ jobs:
       pull-requests: write
       
     steps:
-      # Show the base branch from "build-feature" workflow for Debug pruposes      
+# Show the base branch from "build-feature" workflow for Debug pruposes      
       - name: Debug Payload
         run: |     
          echo ${{ github.event.client_payload.base_branch }}
