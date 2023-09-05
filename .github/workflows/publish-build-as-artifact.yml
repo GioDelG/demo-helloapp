@@ -37,11 +37,11 @@ jobs:
       - name: Build Project
         run: npm run build
 # Publish it as an artifact
-#      - name: Publish Dir Directory
-#        if: success()
-#        uses: actions/upload-artifact@v3
-#        with:
-#          name: ${{ env.ARTIFACT_NAME }}
-#          path: ${{ github.workspace }}/dist
+      - name: Publish Dir Directory
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ github.workspace }}/dist
           
           
