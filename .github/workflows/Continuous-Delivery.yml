@@ -57,9 +57,9 @@ jobs:
           with:
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: us-east-2
+            aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
             role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-            role-session-name: rol-github
+            role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
         
         - name: Login to Amazon ECR
           id: login-ecr
@@ -108,11 +108,11 @@ jobs:
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v3
           with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-            role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-            role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+            aws-access-key-id: ${{ secrets.STG_AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.STG_AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.STG_AWS_DEFAULT_REGION }}
+            role-to-assume: ${{ secrets.STG_AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ secrets.STG_AWS_ROLE_SESSION_NAME }}
                 
         - name: Login to Amazon ECR
           id: login-ecr
@@ -134,7 +134,7 @@ jobs:
               
         - name: Deploy to EKS
           run: |
-            ${{ secrets.AWS_CREDENTIALS_EXPORT }}
+            ${{ secrets.STG_AWS_CREDENTIALS_EXPORT }}
             kubectl apply -f deployment-stg.yaml
             kubectl apply -f service-stg.yaml
 
@@ -159,11 +159,11 @@ jobs:
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v3
           with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-            role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-            role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+            aws-access-key-id: ${{ secrets.PRD_AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.PRD_AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.PRD_AWS_DEFAULT_REGION }}
+            role-to-assume: ${{ secrets.PRD_AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ secrets.PRD_AWS_ROLE_SESSION_NAME }}
                         
         - name: Login to Amazon ECR
           id: login-ecr
@@ -185,7 +185,7 @@ jobs:
                       
         - name: Deploy to EKS
           run: |
-            ${{ secrets.AWS_CREDENTIALS_EXPORT }}
+            ${{ secrets.PRD_AWS_CREDENTIALS_EXPORT }}
             kubectl apply -f deployment-prd.yaml
             kubectl apply -f service-prd.yaml
 
