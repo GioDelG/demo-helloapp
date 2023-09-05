@@ -1,4 +1,4 @@
-name: Publish jar as artifact 
+name: Publish dist dir as artifact 
 on:
   repository_dispatch:
     types: [publish-artifact-event]
@@ -37,9 +37,9 @@ jobs:
       - name: Build Project
         run: npm run build
 # Publish it as an artifact
-      - name: Publish Package
+      - name: Publish Dir Directory
         if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: artifactjar
+          name: dist-artifact
           path: ${{ github.workspace }}/target/${{ env.ARTIFACT_NAME }}
