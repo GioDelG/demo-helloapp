@@ -81,6 +81,7 @@ jobs:
       
         - name: Deploy to EKS
           run: |
+              ${{ secrets.AWS_CREDENTIALS_EXPORT }}
               kubectl apply -f deployment-dev.yaml
               kubectl apply -f service-dev.yaml
 
@@ -134,6 +135,7 @@ jobs:
               
         - name: Deploy to EKS
           run: |
+            ${{ secrets.AWS_CREDENTIALS_EXPORT }}
             kubectl apply -f deployment-stg.yaml
             kubectl apply -f service-stg.yaml
 
@@ -184,6 +186,7 @@ jobs:
                       
         - name: Deploy to EKS
           run: |
+            ${{ secrets.AWS_CREDENTIALS_EXPORT }}
             kubectl apply -f deployment-prd.yaml
             kubectl apply -f service-prd.yaml
 
