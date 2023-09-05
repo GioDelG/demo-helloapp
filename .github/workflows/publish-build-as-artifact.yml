@@ -1,0 +1,45 @@
+name: Publish jar as artifact 
+on:
+  repository_dispatch:
+    types: [publish-artifact-event]
+jobs:
+  download-artifact-job:
+    runs-on: ubuntu-latest
+    env:
+      # Define ENV VAR
+      ARTIFACT_NAME: 'dist-artifact'
+    permissions:
+      contents: write
+      pull-requests: write
+      
+    steps:      
+      - name: Debug Payload
+# Show the base branch from build-feature workflow for Debug pruposes
+        run: |     
+         echo ${{ github.event.client_payload.base_branch }}             
+# Download source code from default branch in order to retrive Dockerfile, and upload it as docker build context      
+      - uses: actions/checkout@v3  
+        with:
+          # Get the base branch from build-feature workflow
+          ref: ${{ github.event.client_payload.base_branch }}
+          fetch-depth: 0
+# Show the two last commits of the branch for debug pruposes
+      - name: check last hashid
+        run: |
+          git log -2 
+# Setup Node.js and check that the source code is buildable
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build Project
+        run: npm run build
+# Publish it as an artifact
+      - name: Publish Package
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifactjar
+          path: ${{ github.workspace }}/target/${{ env.ARTIFACT_NAME }}
