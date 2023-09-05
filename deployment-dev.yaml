@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: express-qa
-  namespace: quality assurance
+  namespace: quality-assurance
 spec:
   replicas: 1
   selector:
