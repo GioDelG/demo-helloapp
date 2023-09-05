@@ -23,6 +23,8 @@ jobs:
 # Runs unit tests
     Unit-Tests:
       runs-on: ubuntu-latest
+      needs: Source-Build
+      if: ${{ success() }}
       steps:
           - name: Checkout Code
             uses: actions/checkout@v3
@@ -36,11 +38,6 @@ jobs:
             run: npm ci
           - name: Execute Tests
             run: npm test
-          - name: Get working directory list
-            run: |
-              WD=$(pwd)
-              echo "wd=${WD}" >> $GITHUB_ENV
-            id: working-dir
 
 # Automatic merge to develop branch
     # Execute only if the previos job ended succesfully
