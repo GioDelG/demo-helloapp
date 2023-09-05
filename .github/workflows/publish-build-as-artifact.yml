@@ -14,7 +14,7 @@ jobs:
       
     steps:      
       - name: Debug Payload
-# Show the base branch from build-feature workflow for Debug pruposes
+# Show the base branch from "build-feature" workflow for Debug pruposes
         run: |     
          echo ${{ github.event.client_payload.base_branch }}             
 # Download source code from default branch in order to retrive Dockerfile, and upload it as docker build context      
