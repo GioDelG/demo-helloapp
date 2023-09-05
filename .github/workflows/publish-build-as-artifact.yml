@@ -45,7 +45,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.ARTIFACT_NAME }}
+          name: built-artifact
           path: ${{ github.workspace }}/target/${{ env.ARTIFACT_NAME }} 
           
           
