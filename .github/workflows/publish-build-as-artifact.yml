@@ -1,4 +1,4 @@
-name: Publish dist as artifact 
+name: Publish Node.js Build as Artifact 
 on:
   repository_dispatch:
     types: [publish-artifact-event]
@@ -32,7 +32,7 @@ jobs:
 
 # Setup Node.js and check that the source code is buildable
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 16
       - name: Install Dependencies
@@ -46,6 +46,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: built-artifact
-          path: ${{ github.workspace }}/target/${{ env.ARTIFACT_NAME }} 
+          path: ${{ github.workspace }}/target/${{ env.ARTIFACT_NAME }}
           
           

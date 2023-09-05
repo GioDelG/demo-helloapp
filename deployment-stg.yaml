@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-stg
+  namespace: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: express
+  template:
+    metadata:
+      labels:
+        app: express
+    spec:
+      containers:
+      - name: express
+        image: 027188235773.dkr.ecr.us-east-2.amazonaws.com/express:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080
