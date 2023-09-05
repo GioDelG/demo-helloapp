@@ -41,9 +41,6 @@ jobs:
               WD=$(pwd)
               echo "wd=${WD}" >> $GITHUB_ENV
             id: working-dir
-          - uses: grandmasterdev/github-action-ci-nodejs-build-test@latest
-            with:
-              working-dir: ${{github.workspace}}
 
 # Automatic merge to develop branch
     # Execute only if the previos job ended succesfully
@@ -78,6 +75,7 @@ jobs:
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
             branch: ${{ github.base_ref }}
+
 
 # Call workflow: "publish-build-as-artifact"
         - name: trigger deploy artifact
