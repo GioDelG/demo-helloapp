@@ -12,7 +12,7 @@ permissions:
     packages: write
           
 jobs:
-    Build-Node:
+    Build-Aplication:
         # Define the platform to work in
         runs-on: ubuntu-latest
         
@@ -36,7 +36,7 @@ jobs:
     Deploy-to-Dev:
         name: Deploy to Development
         if: github.event_name == 'pull_request'
-        needs: [Build-Node]
+        needs: [Build-Aplication]
         # Define the platform to work in
         runs-on: ubuntu-latest
         environment:
@@ -45,7 +45,13 @@ jobs:
         steps:
         - name: Checkout code
           uses: actions/checkout@v3
-    
+
+        - name: Use Node.js 
+          uses: actions/setup-node@v2
+          with:
+            node-version: 16
+        - run: npm ci
+
         - name: Install kubectl
           uses: azure/setup-kubectl@v3
           with:
@@ -89,7 +95,7 @@ jobs:
     Deploy-to-Stg:
         name: Deploy to Staging
         if: github.event.ref == 'refs/heads/main'
-        needs: [Build-Node]
+        needs: [Build-Aplication]
         # Define the platform to work in
         runs-on: ubuntu-latest
         environment:
@@ -98,7 +104,16 @@ jobs:
         steps:
         - name: Checkout code
           uses: actions/checkout@v3
-            
+
+        - name: Checkout code
+          uses: actions/checkout@v3
+
+        - name: Use Node.js 
+          uses: actions/setup-node@v2
+          with:
+            node-version: 16
+        - run: npm ci
+
         - name: Install kubectl
           uses: azure/setup-kubectl@v3
           with:
@@ -150,7 +165,16 @@ jobs:
         steps:
         - name: Checkout code
           uses: actions/checkout@v3
-                    
+
+        - name: Checkout code
+          uses: actions/checkout@v3
+
+        - name: Use Node.js 
+          uses: actions/setup-node@v2
+          with:
+            node-version: 16
+        - run: npm ci
+
         - name: Install kubectl
           uses: azure/setup-kubectl@v3
           with:
