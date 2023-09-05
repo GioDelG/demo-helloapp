@@ -52,16 +52,12 @@ jobs:
             version: 'v1.28.0'
           id: install
 
-        - name: Export AWS VARS
-          run: |
-            ${{ secrets.AWS_CREDENTIALS_EXPORT }}
-
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v3
           with:
-            aws-region: us-east-2
             aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: us-east-2
             role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
             role-session-name: rol-github
 
