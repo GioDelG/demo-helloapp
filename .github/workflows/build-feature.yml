@@ -8,24 +8,26 @@ jobs:
     build-feature:
         # Define the platform to work in
         runs-on: ubuntu-latest
-        
         steps:
             # Checkout your code into the container
             - uses: actions/checkout@v3
               with:
-                # Making a pull_request on develop: Download the code from feature branch
-                ref: ${{ github.event.pull_request.head.sha }}
-            # Setup node and npm to your path
+                ref: ${{ github.event.pull_request.head.sha }} # Making a pull_request on develop: Download the code from feature branch
+            
+                # Setup node and npm to your path
             - name: Use Node.js 
               uses: actions/setup-node@v2
               with:
                 node-version: 16
+
             # Runs clean install of npm for automated environments
             - name: Clean Install
               run: npm ci
+
             # Run Build
             - name: Build project assest
               run: npm run build
+              
             # Run tests
             - name: Execute Tests
               run: npm test
@@ -40,14 +42,14 @@ jobs:
       permissions:
         contents: write
         pull-requests: write
-      
       steps:
 # Dowload the code from destination branch (develop) | fetch-depth: 0 to fech all history for all branches
         - uses: actions/checkout@v3
           with:
             ref: ${{ github.base_ref }}
             fetch-depth: 0
-# Merge to develop branch if previos jobs ended succesfully
+
+            # Merge to develop branch if previos jobs ended succesfully
         - name: Merge to development branch
           if: ${{ success() }}
           run: |
@@ -55,19 +57,21 @@ jobs:
             git config --global user.name "WORKFLOW-USER" 
             #Using -m "mesage" on merge command ins mandatori here in order to avoid open a text editor to write a commit message
             git merge --no-ff --verbose origin/${{ github.event.pull_request.head.ref }} -m "Merge pull request #${{ github.event.number }}"
-# Push changes after merge if previos jobs ended succesfully
+
+            # Push changes after merge if previos jobs ended succesfully
         - name: Push changes after merge
           if: ${{ success() }}
           uses: ad-m/github-push-action@master
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
             branch: ${{ github.base_ref }}
+
 # Call workflow: "publish-build-as-artifact"
         - name: trigger deploy artifact
+          if: success()
           uses: peter-evans/repository-dispatch@v2
           with:
             token: ${{ secrets.GITHUB_TOKEN }}
             repository: ${{ github.repository }}
             event-type: publish-artifact-event
-            # Send the name of the base branch used in this workflow (develop)
-            client-payload: '{ "base_branch": "${{ github.base_ref }}" }'
+            client-payload: '{ "base_branch": "${{ github.base_ref }}" }' # Send the name of the base branch used in this workflow (develop)
