@@ -64,7 +64,6 @@ jobs:
             branch: ${{ github.base_ref }}
 # Call workflow: "publish-build-as-artifact"
         - name: trigger deploy artifact
-          if: success()
           uses: peter-evans/repository-dispatch@v2
           with:
             token: ${{ secrets.GITHUB_TOKEN }}
