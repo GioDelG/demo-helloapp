@@ -82,8 +82,8 @@ jobs:
         - name: Deploy to EKS
           run: |
               ${{ secrets.AWS_CREDENTIALS_EXPORT }}
-              kubectl apply -f deployment-dev.yaml
-              kubectl apply -f service-dev.yaml
+              kubectl apply -f deployment-qa.yaml
+              kubectl apply -f service-qa.yaml
 
 
     Deploy-to-Stg:
