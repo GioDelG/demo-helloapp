@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Define ENV VAR
-      ARTIFACT_NAME: 'dist-artifact'
+      ARTIFACT_NAME: 'server.js'
     permissions:
       contents: write
       pull-requests: write
@@ -39,7 +39,7 @@ jobs:
         run: npm ci
       - name: Build Project
         run: npm run build
-        
+
 # Publish it as an artifact
       - name: Publish Dir Directory
         if: success()
