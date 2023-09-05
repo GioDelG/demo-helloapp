@@ -13,29 +13,29 @@ jobs:
       pull-requests: write
       
     steps:      
+      - name: Debug Payload
+# Show the base branch from "build-feature" workflow for Debug pruposes
+        run: |     
+         echo ${{ github.event.client_payload.base_branch }}
 # Download source code from default branch in order to retrive Dockerfile, and upload it as docker build context      
       - uses: actions/checkout@v3  
         with:
           # Get the base branch from build-feature workflow
           ref: ${{ github.event.client_payload.base_branch }}
           fetch-depth: 0
-      - name: Debug Payload
-          # Show the base branch from "build-feature" workflow for Debug pruposes
-        run: |     
-          echo ${{ github.event.client_payload.base_branch }}
 # Show the two last commits of the branch for debug pruposes
       - name: check last hashid
         run: |
           git log -2 
 # Setup Node.js and check that the source code is buildable
-#      - name: Setup Node.js
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: 16
-#      - name: Install Dependencies
-#        run: npm ci
-#      - name: Build Project
-#        run: npm run build
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build Project
+        run: npm run build
 # Publish it as an artifact
       - name: Publish Dir Directory
         if: success()
@@ -43,3 +43,4 @@ jobs:
         with:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ github.workspace }}/dist
+          
