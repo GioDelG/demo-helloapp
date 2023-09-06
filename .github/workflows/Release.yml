@@ -1,13 +1,13 @@
 name: Create Release
 on:
-    push:
-      branches:
-        - main
-        - develop
-          tags:
-            - 'v*'
-    repository_dispatch:
-        types: [create-release]
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - 'v*'
+  repository_dispatch:
+    types: [create-release]
 
 permissions:
     id-token: write
