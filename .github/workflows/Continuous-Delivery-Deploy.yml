@@ -104,12 +104,43 @@ jobs:
         # Define the platform to work in
         runs-on: ubuntu-latest
         environment:
-            name: Development
+          name: Development
 
         steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+      
+        - name: Use Node.js 
+          uses: actions/setup-node@v2
+          with:
+            node-version: 16
+        - run: npm ci
+      
+        - name: Install kubectl
+          uses: azure/setup-kubectl@v3
+          with:
+            version: 'v1.28.0'
+          id: install
+      
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v3
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+            role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+
+        - name: Update kube config
+          run: aws eks update-kubeconfig --name eks-demo --region us-east-2
+
         - name: Deploy to EKS
           run: |
               kubectl get ns
+              kubectl get deployment
+              kubectl get service -n quality-assurance
+              kubectl get pods -o wide -n quality-assurance
+    
 
     Deploy-to-Stg:
         name: Deploy to Staging
