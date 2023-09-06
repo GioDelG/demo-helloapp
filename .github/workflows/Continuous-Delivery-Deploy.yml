@@ -33,15 +33,14 @@ jobs:
             - name: Ejecutar pruebas
               run: npm test
         
-    Deploy-to-Dev:
-        name: Deploy to Development
+    Deploy-to-QA:
+        name: Deploy to Quality Assurance
         if: github.event_name == 'pull_request'
         needs: [Build-Application-Tests]
         # Define the platform to work in
         runs-on: ubuntu-latest
         environment:
             name: Development
-            url: http://${{ steps.get-lb-url.outputs.lb_url }}/
 
         steps:
         - name: Checkout code
@@ -97,6 +96,50 @@ jobs:
               kubectl apply -f deployment-qa.yaml
               kubectl apply -f service-qa.yaml
 
+    Dev-EKS-Values:
+        name: Get Kubernetes Values
+        needs: [Deploy-to-QA]
+        if: success()
+        # Define the platform to work in
+        runs-on: ubuntu-latest
+        environment:
+          name: Development
+
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+      
+        - name: Use Node.js 
+          uses: actions/setup-node@v2
+          with:
+            node-version: 16
+        - run: npm ci
+      
+        - name: Install kubectl
+          uses: azure/setup-kubectl@v3
+          with:
+            version: 'v1.28.0'
+          id: install
+      
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v3
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+            role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+
+        - name: Update kube config
+          run: aws eks update-kubeconfig --name eks-demo --region us-east-2
+
+        - name: Get Quality Assurance EKS Values
+          run: |
+              kubectl get ns
+              kubectl get deployment -n quality-assurance -o wide
+              kubectl get service -n quality-assurance
+              kubectl get pods -o wide -n quality-assurance
+    
 
     Deploy-to-Stg:
         name: Deploy to Staging
@@ -106,12 +149,8 @@ jobs:
         runs-on: ubuntu-latest
         environment:
             name: Staging
-            url: http://${{ steps.get-lb-url.outputs.lb_url }}/
         
         steps:
-        - name: Checkout code
-          uses: actions/checkout@v3
-
         - name: Checkout code
           uses: actions/checkout@v3
 
@@ -166,6 +205,50 @@ jobs:
             kubectl apply -f deployment-stg.yaml
             kubectl apply -f service-stg.yaml
 
+    Stg-EKS-Values:
+        name: Get Kubernetes Values
+        needs: [Deploy-to-Stg]
+        if: success()
+        # Define the platform to work in
+        runs-on: ubuntu-latest
+        environment:
+          name: Staging
+
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+      
+        - name: Use Node.js 
+          uses: actions/setup-node@v2
+          with:
+            node-version: 16
+        - run: npm ci
+      
+        - name: Install kubectl
+          uses: azure/setup-kubectl@v3
+          with:
+            version: 'v1.28.0'
+          id: install
+      
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v3
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+            role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+
+        - name: Update kube config
+          run: aws eks update-kubeconfig --name eks-demo --region us-east-2
+
+        - name: Get Staging EKS Values
+          run: |
+              kubectl get ns
+              kubectl get deployment -n staging -o wide
+              kubectl get service -n staging
+              kubectl get pods -o wide -n staging
+
     Deploy-to-Prod:
         name: Deploy to Production
         needs: [Deploy-to-Stg]
@@ -173,12 +256,8 @@ jobs:
         runs-on: ubuntu-latest
         environment:
                 name: Production
-                url: http://${{ steps.get-lb-url.outputs.lb_url }}/
                 
         steps:
-        - name: Checkout code
-          uses: actions/checkout@v3
-
         - name: Checkout code
           uses: actions/checkout@v3
 
@@ -231,6 +310,50 @@ jobs:
           run: |
             kubectl apply -f deployment-prd.yaml
             kubectl apply -f service-prd.yaml
+
+    Prod-EKS-Values:
+        name: Get Kubernetes Values
+        needs: [Deploy-to-Prod]
+        if: success()
+        # Define the platform to work in
+        runs-on: ubuntu-latest
+        environment:
+          name: Production
+
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+      
+        - name: Use Node.js 
+          uses: actions/setup-node@v2
+          with:
+            node-version: 16
+        - run: npm ci
+      
+        - name: Install kubectl
+          uses: azure/setup-kubectl@v3
+          with:
+            version: 'v1.28.0'
+          id: install
+      
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v3
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+            role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+            role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
+
+        - name: Update kube config
+          run: aws eks update-kubeconfig --name eks-demo --region us-east-2
+
+        - name: Get Production EKS Values
+          run: |
+              kubectl get ns
+              kubectl get deployment -n production -o wide
+              kubectl get service -n production
+              kubectl get pods -o wide -n production
 
 # Call workflow: "create release"
         - name: trigger create release
