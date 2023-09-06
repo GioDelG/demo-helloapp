@@ -133,10 +133,10 @@ jobs:
         - name: Update kube config
           run: aws eks update-kubeconfig --name eks-demo --region us-east-2
 
-        - name: Deploy to EKS
+        - name: Get Quality Assurance EKS Values
           run: |
               kubectl get ns
-              kubectl get get deployment -n quality-assurance -o wide
+              kubectl get deployment -n quality-assurance -o wide
               kubectl get service -n quality-assurance
               kubectl get pods -o wide -n quality-assurance
     
@@ -242,10 +242,10 @@ jobs:
         - name: Update kube config
           run: aws eks update-kubeconfig --name eks-demo --region us-east-2
 
-        - name: Deploy to EKS
+        - name: Get Staging EKS Values
           run: |
               kubectl get ns
-              kubectl get get deployment -n staging -o wide
+              kubectl get deployment -n staging -o wide
               kubectl get service -n staging
               kubectl get pods -o wide -n staging
 
@@ -348,10 +348,10 @@ jobs:
         - name: Update kube config
           run: aws eks update-kubeconfig --name eks-demo --region us-east-2
 
-        - name: Deploy to EKS
+        - name: Get Production EKS Values
           run: |
               kubectl get ns
-              kubectl get get deployment -n production -o wide
+              kubectl get deployment -n production -o wide
               kubectl get service -n production
               kubectl get pods -o wide -n production
 
