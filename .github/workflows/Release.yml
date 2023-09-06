@@ -38,7 +38,7 @@ jobs:
             tag_name: ${{ steps.get_tag_name.outputs.tag_name }} # Utiliza la salida del paso anterior
             release_name: Release ${{ steps.get_tag_name.outputs.tag_name }}
             draft: false
-            prerelease: false
+            prerelease: true # For pre-release versions
 
         - name: Upload Release Asset
           id: upload-release-asset 
@@ -50,3 +50,6 @@ jobs:
             asset_path: ./hello-world.zip
             asset_name: hello-world.zip
             asset_content_type: application/zip
+
+# Con esta config podremos crear versiones de prelanzamiento con el mismo nombre de etiqueta sin conflictos.
+# Estas son versiones no definitivas y se usan para evaluar previo a la versión final
