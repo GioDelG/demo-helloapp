@@ -89,6 +89,7 @@ jobs:
         - name: Get Load Balancer URL
           id: get-lb-url
           run: |
+            ${{ secrets.AWS_CREDENTIALS_EXPORT }}
             lb_url=$(kubectl get services -n quality-assurance -o wide | awk '$2 == "LoadBalancer" {print $4}')
             echo "lb_url=$lb_url" >> $GITHUB_ENV
       
@@ -159,6 +160,7 @@ jobs:
         - name: Get Load Balancer URL
           id: get-lb-url
           run: |
+            ${{ secrets.AWS_CREDENTIALS_EXPORT }}
             lb_url=$(kubectl get services -n staging -o wide | awk '$2 == "LoadBalancer" {print $4}')
             echo "lb_url=$lb_url" >> $GITHUB_ENV
               
@@ -226,6 +228,7 @@ jobs:
         - name: Get Load Balancer URL
           id: get-lb-url
           run: |
+            ${{ secrets.AWS_CREDENTIALS_EXPORT }}
             lb_url=$(kubectl get services -n production -o wide | awk '$2 == "LoadBalancer" {print $4}')
             echo "lb_url=$lb_url" >> $GITHUB_ENV
                       
