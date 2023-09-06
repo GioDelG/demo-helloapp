@@ -213,3 +213,35 @@ jobs:
             ${{ secrets.AWS_CREDENTIALS_EXPORT }}
             kubectl apply -f deployment-prd.yaml
             kubectl apply -f service-prd.yaml
+
+    Release:
+        name: Create Release
+        needs: Deploy-to-Prod
+        if: ${{ success() }}
+        # Define the platform to work in
+        runs-on: ubuntu-latest
+        environment:
+                name: Production
+                      
+        steps:
+          - uses: actions/checkout@v3
+
+          - name: Create Github Release
+            id: create-new-release
+            uses: actions/create-release@v1
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            with:
+              tag_name: ${{ github.run_number }}
+              release_name: Release ${{ github.run_number }}
+
+          - name: Upload Release Asset
+            uses: actions/upload-release-asset@v1
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            with:
+              upload_url: ${{ steps.create-new-release.outputs.upload_url }}
+              asset_path: ./deploy.zip
+              asset_name: deploy-v${{ github.run_number }}
+              asset_content_type: application/zip
+
