@@ -1,7 +1,7 @@
 # Usar la imagen oficial de Node.js
 FROM node:16
 
-WORKDIR /scr/app
+WORKDIR /
 
 COPY package*.json ./
 
