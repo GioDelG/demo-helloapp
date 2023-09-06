@@ -37,7 +37,7 @@ jobs:
               fi
             done
             new_version=$(echo $latest_version | awk -F. -v OFS=. '{$NF = $NF + 1;} 1')
-            cho "::set-output name=new_version::$new_version"
+            echo "::set-output name=new_version::$new_version"
           shell: bash
 
         - name: Build project # This would actually build your project, using zip for an example artifact
