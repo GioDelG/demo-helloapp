@@ -1,7 +1,10 @@
 name: Create Release
 on:
     push:
-        tags:
+      branches:
+        - main
+        - develop
+          tags:
             - 'v*'
     repository_dispatch:
         types: [create-release]
