@@ -215,11 +215,11 @@ jobs:
             kubectl apply -f service-prd.yaml
 
 # Call workflow: "create release"
-#        - name: trigger create release
-#          if: success()
-#          uses: peter-evans/repository-dispatch@v2
-#          with:
-#            token: ${{ secrets.GITHUB_TOKEN }}
-#            repository: ${{ github.repository }}
-#            event-type: create-release
-#            client-payload: '{ "base_branch": "${{ github.base_ref }}" }'
+        - name: trigger create release
+          if: success()
+          uses: peter-evans/repository-dispatch@v2
+          with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            repository: ${{ github.repository }}
+            event-type: create-release
+            client-payload: '{ "base_branch": "${{ github.base_ref }}" }'
