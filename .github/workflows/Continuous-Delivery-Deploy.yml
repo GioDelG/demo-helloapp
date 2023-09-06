@@ -8,7 +8,7 @@ on:
 
 permissions:
     id-token: write
-    contents: read
+    contents: write
     packages: write
           
 jobs:
@@ -244,4 +244,3 @@ jobs:
               asset_path: ./deploy.zip
               asset_name: deploy-v${{ github.run_number }}
               asset_content_type: application/zip
-
