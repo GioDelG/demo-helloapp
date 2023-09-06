@@ -1,15 +1,15 @@
 # Usar la imagen oficial de Node.js
 FROM node:16
 
-WORKDIR /scr/app
+WORKDIR /
 
 COPY package*.json ./
 
 RUN npm install
 
-COPY . .
+COPY dist /app
 
 ENV PORT=8080
 
 # Comando para iniciar la aplicación
-CMD ["node", "server.js"]
+CMD ["node", "app/server.js"]
