@@ -2,7 +2,7 @@ name: Create Release
 on:
   push:
     tags:
-      - 'v*'
+      - '*'
   repository_dispatch:
     types: [create-release]
 
