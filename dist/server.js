@@ -18,3 +18,4 @@ app.get('/health', function (req, res) {
 app.listen(PORT, HOST, function () {
   console.log("Running on http://".concat(HOST, ":").concat(PORT));
 });
+module.exports = app;
