@@ -46,6 +46,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: built-artifact
-          path: ${{ github.workspace }}/target/${{ env.ARTIFACT_NAME }}
+          path: ${{ github.workspace }}/dist/${{ env.ARTIFACT_NAME }}
           
           
