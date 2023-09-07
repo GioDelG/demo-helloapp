@@ -7,7 +7,7 @@ COPY package*.json ./
 
 RUN npm install
 
-COPY dist /app
+COPY src/server.js /app
 
 ENV PORT=8080
 
