@@ -1,4 +1,4 @@
-# Usar la imagen oficial de Node.js
+# Usar la imagen de Node.js
 FROM node:16
 
 WORKDIR /app
