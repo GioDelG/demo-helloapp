@@ -25,8 +25,22 @@
     "@babel/cli": "^7.22.15",
     "@babel/core": "^7.22.15",
     "@babel/preset-env": "^7.22.15",
+    "@semantic-release/commit-analyzer": "^10.0.4",
+    "@semantic-release/github": "^9.0.4",
+    "@semantic-release/release-notes-generator": "^11.0.7",
     "chai": "^4.3.8",
     "chai-http": "^4.4.0",
-    "mocha": "^10.2.0"
+    "mocha": "^10.2.0",
+    "semantic-release": "^21.1.1"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/github"
+    ]
   }
 }
