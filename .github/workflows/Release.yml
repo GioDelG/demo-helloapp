@@ -1,8 +1,9 @@
 name: Create Release
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - main
+      
   repository_dispatch:
     types: [create-release]
 
@@ -21,32 +22,27 @@ jobs:
         - name: Checkout code
           uses: actions/checkout@v2
 
-        # If there is no version, use v1.0.0
-        # If there is a version, increases on minor
-        - name: Determine Next Version
-          id: determine_next_version
-          run: |
-              set -x
-              git fetch --tags
-              latest_version=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1 || true)
-              if [[ -z "$latest_version" ]]; then
-                new_version="v1.0.0"
-              else
-                major_version=$(echo $latest_version | cut -d'.' -f2)
-                minor_version=$(echo $latest_version | cut -d'.' -f3)
-                new_minor_version=$((minor_version + 1))
-                new_version="v${major_version}.${new_minor_version}.0"
-                while git rev-parse "$new_version" >/dev/null 2>&1; do
-                  new_minor_version=$((new_minor_version + 1))
-                  new_version="v${major_version}.${new_minor_version}.0"
-                done
-              fi
-                echo "::set-output name=new_version::$new_version"
-          shell: bash
+        - name: Setup Node.js
+          uses: actions/setup-node@v2
+          with:
+            node-version: '14'
+  
+        - name: Install dependencies
+          run: npm ci
+
+      # Use semantic-release to determine and create a new version
+        - name: Semantic Release
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: npx semantic-release
 
         - name: Build project # Build your project, using zip for an example artifact
           run: |
             zip --junk-paths hello-world README.md
+
+        - name: Get the latest release tag
+          id: get_version
+          run: echo "::set-output name=version::$(git describe --tags --abbrev=0)"
 
         - name: Create Release
           id: create_release
@@ -54,8 +50,8 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
-            tag_name: ${{ steps.determine_next_version.outputs.new_version }}
-            release_name: Release ${{ steps.determine_next_version.outputs.new_version }}
+            tag_name: ${{ steps.get_version.outputs.version }}
+            release_name: Release ${{ steps.get_version.outputs.version }}
             draft: false
             prerelease: false
 
