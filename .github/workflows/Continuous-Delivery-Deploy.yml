@@ -12,13 +12,33 @@ permissions:
     packages: write
           
 jobs:
-    Build-Application-Tests:
-        # Define the platform to work in
+
+    Setup-Cache-Dependencies:
         runs-on: ubuntu-latest
-        
         steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+
+        - name: Use Node.js 
+          uses: actions/setup-node@v2
+          with:
+            node-version: 18
+
+        - name: Cache node modules
+          uses: actions/cache@v2
+          with:
+            path: node_modules
+            key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+            restore-keys: |
+              ${{ runner.OS }}-node-18-
+        - run: npm ci
+
+    Build-Application-Tests:
+        runs-on: ubuntu-latest
+        steps:
+          
             # Checkout your code into the container
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
               with:
                 # Making a pull_request on develop: Download the code from feature branch
                 ref: ${{ github.event.pull_request.head.sha }}
@@ -26,7 +46,7 @@ jobs:
             - name: Use Node.js 
               uses: actions/setup-node@v2
               with:
-                node-version: 16
+                node-version: 18
             # Runs clean install of npm for automated environments
             - run: npm ci
             # Run tests
@@ -35,7 +55,7 @@ jobs:
         
     Deploy-to-QA:
         name: Deploy to Quality Assurance
-        needs: [Build-Application-Tests]
+        needs: [Setup-Cache-Dependencies, Build-Application-Tests]
         if: github.event_name == 'pull_request'
         # Define the platform to work in
         runs-on: ubuntu-latest
@@ -45,12 +65,6 @@ jobs:
         steps:
         - name: Checkout code
           uses: actions/checkout@v3
-
-        - name: Use Node.js 
-          uses: actions/setup-node@v2
-          with:
-            node-version: 18
-        - run: npm ci
 
         - name: Install kubectl
           uses: azure/setup-kubectl@v3
@@ -77,7 +91,7 @@ jobs:
 
     QA-EKS-Values:
         name: Get QA Kubernetes Values
-        needs: [Deploy-to-QA]
+        needs: [Setup-Cache-Dependencies, Deploy-to-QA]
         if: success()
         # Define the platform to work in
         runs-on: ubuntu-latest
@@ -87,13 +101,7 @@ jobs:
         steps:
         - name: Checkout code
           uses: actions/checkout@v3
-      
-        - name: Use Node.js 
-          uses: actions/setup-node@v2
-          with:
-            node-version: 18
-        - run: npm ci
-      
+
         - name: Install kubectl
           uses: azure/setup-kubectl@v3
           with:
@@ -122,7 +130,7 @@ jobs:
 
     Deploy-to-Stg:
         name: Deploy to Staging
-        needs: [Build-Application-Tests]
+        needs: [Setup-Cache-Dependencies, Build-Application-Tests]
         if: github.event.ref == 'refs/heads/main'
         # Define the platform to work in
         runs-on: ubuntu-latest
@@ -132,12 +140,6 @@ jobs:
         steps:
         - name: Checkout code
           uses: actions/checkout@v3
-
-        - name: Use Node.js 
-          uses: actions/setup-node@v2
-          with:
-            node-version: 18
-        - run: npm ci
 
         - name: Install kubectl
           uses: azure/setup-kubectl@v3
@@ -164,7 +166,7 @@ jobs:
 
     Stg-EKS-Values:
         name: Get Stg Kubernetes Values
-        needs: [Deploy-to-Stg]
+        needs: [Setup-Cache-Dependencies, Deploy-to-Stg]
         if: success()
         # Define the platform to work in
         runs-on: ubuntu-latest
@@ -174,13 +176,7 @@ jobs:
         steps:
         - name: Checkout code
           uses: actions/checkout@v3
-      
-        - name: Use Node.js 
-          uses: actions/setup-node@v2
-          with:
-            node-version: 18
-        - run: npm ci
-      
+
         - name: Install kubectl
           uses: azure/setup-kubectl@v3
           with:
@@ -208,7 +204,7 @@ jobs:
 
     Deploy-to-Prod:
         name: Deploy to Production
-        needs: [Deploy-to-Stg]
+        needs: [Setup-Cache-Dependencies, Deploy-to-Stg]
         # Define the platform to work in
         runs-on: ubuntu-latest
         environment:
@@ -217,12 +213,6 @@ jobs:
         steps:
         - name: Checkout code
           uses: actions/checkout@v3
-
-        - name: Use Node.js 
-          uses: actions/setup-node@v2
-          with:
-            node-version: 18
-        - run: npm ci
 
         - name: Install kubectl
           uses: azure/setup-kubectl@v3
@@ -249,21 +239,14 @@ jobs:
 
     Image-to-ECR:
         name: Docker Image to ECR
-        needs: [Deploy-to-Prod]
+        needs: [Setup-Cache-Dependencies, Deploy-to-Prod]
         if: success()
         runs-on: ubuntu-latest
         environment:
           name: Production
         steps:
-
         - name: Checkout code
           uses: actions/checkout@v3
-
-        - name: Use Node.js 
-          uses: actions/setup-node@v2
-          with:
-            node-version: 18
-        - run: npm ci
 
         - name: Install kubectl
           uses: azure/setup-kubectl@v3
@@ -297,7 +280,7 @@ jobs:
 
     Prod-EKS-Values:
         name: Get Prod Kubernetes Values
-        needs: [Deploy-to-Prod]
+        needs: [Setup-Cache-Dependencies, Deploy-to-Prod]
         if: success()
         # Define the platform to work in
         runs-on: ubuntu-latest
@@ -307,13 +290,7 @@ jobs:
         steps:
         - name: Checkout code
           uses: actions/checkout@v3
-      
-        - name: Use Node.js 
-          uses: actions/setup-node@v2
-          with:
-            node-version: 18
-        - run: npm ci
-      
+
         - name: Install kubectl
           uses: azure/setup-kubectl@v3
           with:
