@@ -28,7 +28,7 @@ jobs:
             node-version: '14'
   
         - name: Install dependencies
-          run: npm ci
+          run: npm install
 
       # Use semantic-release to determine and create a new version
         - name: Semantic Release
