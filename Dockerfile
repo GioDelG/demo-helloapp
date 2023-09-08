@@ -1,5 +1,5 @@
 # Usar la imagen de Node.js
-FROM node:16
+FROM node:18
 
 WORKDIR /app
 
