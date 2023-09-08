@@ -39,9 +39,6 @@ jobs:
         runs-on: ubuntu-latest
         steps:
 
-            - name: Instala dependencias
-              run: npm ci
-
             - name: Ejecutar pruebas
               run: npm test
         
