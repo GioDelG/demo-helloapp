@@ -21,9 +21,8 @@ jobs:
         - name: Checkout code
           uses: actions/checkout@v2
 
-        #If there is no version, use v1.0.0
-        # Also, extract version
-        # Increases the version
+        # If there is no version, use v1.0.0
+        # If there is a version, increases on minor
         - name: Determine Next Version
           id: determine_next_version
           run: |
