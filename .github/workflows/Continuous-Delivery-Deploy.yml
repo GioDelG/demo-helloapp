@@ -32,20 +32,10 @@ jobs:
             # Run tests
             - name: Ejecutar pruebas
               run: npm test
-              
-    Build-Docker-Image:
-          runs-on: ubuntu-latest
-          env:
-            ECR_REPOSITORY: express
-            IMAGE_TAG: ${{ github.sha }}
-          steps:
-            - uses: actions/checkout@v2
-            - name: Build docker image
-              run: docker build -t express:latest .
         
     Deploy-to-QA:
         name: Deploy to Quality Assurance
-        needs: [Build-Application-Tests, Build-Docker-Image]
+        needs: [Build-Application-Tests]
         if: github.event_name == 'pull_request'
         # Define the platform to work in
         runs-on: ubuntu-latest
@@ -132,7 +122,7 @@ jobs:
 
     Deploy-to-Stg:
         name: Deploy to Staging
-        needs: [Build-Application-Tests, Build-Docker-Image]
+        needs: [Build-Application-Tests]
         if: github.event.ref == 'refs/heads/main'
         # Define the platform to work in
         runs-on: ubuntu-latest
@@ -218,7 +208,7 @@ jobs:
 
     Deploy-to-Prod:
         name: Deploy to Production
-        needs: [Deploy-to-Stg, Build-Docker-Image]
+        needs: [Deploy-to-Stg]
         # Define the platform to work in
         runs-on: ubuntu-latest
         environment:
@@ -261,8 +251,8 @@ jobs:
             ECR_REPOSITORY: express
             IMAGE_TAG: ${{ github.sha }}
           run: |
-            docker tag express:latest $ECR_REGISTRY/$ECR_REPOSITORY
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY
+                docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+                docker push $ECR_REGISTRY/$ECR_REPOSITORY
                     
         - name: Update kube config
           run: aws eks update-kubeconfig --name eks-demo --region us-east-2
