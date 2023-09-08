@@ -21,28 +21,23 @@ jobs:
         - name: Checkout code
           uses: actions/checkout@v2
 
-          # Get the list of tags
-          # Check if any tag follows the version format (e.g., v1.2.3)
-          # Determine the next version
+        #If there is no version, use v1.0.0
+        # Also, extract version
+        # Increases the version
         - name: Determine Next Version
           id: determine_next_version
           run: |
               git fetch --tags
-              tag_list=$(git tag --list)
-              latest_version="v1.0.0"
-              for tag in $tag_list; do
-                if [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-                  latest_version=$tag
-                fi
-              done
-              # Extraer las partes de la versión
-              major_version=$(echo $latest_version | cut -d'.' -f2)
-              minor_version=$(echo $latest_version | cut -d'.' -f3)
-              # Aumentar el número de versión
-              new_major_version=$major_version
-              new_minor_version=$((minor_version + 1))
-              new_version="v${new_major_version}.${new_minor_version}.0"
-              echo "::set-output name=new_version::$new_version"
+              latest_version=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n1)
+              if [[ -z "$latest_version" ]]; then
+                new_version="v1.0.0"
+              else
+                major_version=$(echo $latest_version | cut -d'.' -f2)
+                minor_version=$(echo $latest_version | cut -d'.' -f3)
+                new_minor_version=$((minor_version + 1))
+                new_version="v${major_version}.${new_minor_version}.0"
+              fi
+                echo "::set-output name=new_version::$new_version"
           shell: bash
 
         - name: Build project # This would actually build your project, using zip for an example artifact
