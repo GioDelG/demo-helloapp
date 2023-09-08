@@ -6,7 +6,6 @@ jobs:
   download-artifact-job:
     runs-on: ubuntu-latest
     env:
-      # Define ENV VAR
       ARTIFACT_NAME: 'server.js'
     permissions:
       contents: write
