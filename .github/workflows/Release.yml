@@ -16,7 +16,7 @@ jobs:
         name: Production
       steps:
         - name: Checkout code
-          uses: actions/checkout@v2
+          uses: actions/checkout@v3
 
         - name: Setup Node.js
           uses: actions/setup-node@v2
@@ -26,30 +26,18 @@ jobs:
         - name: Install dependencies
           run: npm ci
 
-      # Use semantic-release to determine and create a new version
-        - name: Semantic Release
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          run: npx semantic-release
-
-        - name: Build project # Build your project, using zip for an example artifact
+        - name: Build project 
           run: |
             zip --junk-paths hello-world README.md
+
+        - name: Semantic Release
+          env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: npx semantic-release
 
         - name: Get the latest release tag
           id: get_version
           run: echo "::set-output name=version::$(git describe --tags --abbrev=0)"
-
-        - name: Create Release
-          id: create_release
-          uses: actions/create-release@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            tag_name: ${{ steps.get_version.outputs.version }}
-            release_name: Release ${{ steps.get_version.outputs.version }}
-            draft: false
-            prerelease: false
 
         - name: Upload Release Asset
           id: upload-release-asset 
@@ -57,7 +45,7 @@ jobs:
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            upload_url: https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ steps.get_version.outputs.version }}
             asset_path: ./hello-world.zip
             asset_name: hello-world.zip
             asset_content_type: application/zip
