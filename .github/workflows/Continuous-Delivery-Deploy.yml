@@ -75,8 +75,8 @@ jobs:
               kubectl apply -f eks/deployment-qa.yaml
               kubectl apply -f eks/service-qa.yaml
 
-    Dev-EKS-Values:
-        name: Get Kubernetes Values
+    QA-EKS-Values:
+        name: Get QA Kubernetes Values
         needs: [Deploy-to-QA]
         if: success()
         # Define the platform to work in
@@ -163,7 +163,7 @@ jobs:
             kubectl apply -f eks/service-stg.yaml
 
     Stg-EKS-Values:
-        name: Get Kubernetes Values
+        name: Get Stg Kubernetes Values
         needs: [Deploy-to-Stg]
         if: success()
         # Define the platform to work in
@@ -263,7 +263,7 @@ jobs:
             kubectl apply -f eks/service-prd.yaml
 
     Prod-EKS-Values:
-        name: Get Kubernetes Values
+        name: Get Prod Kubernetes Values
         needs: [Deploy-to-Prod]
         if: success()
         # Define the platform to work in
