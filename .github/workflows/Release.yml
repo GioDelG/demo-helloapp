@@ -35,6 +35,10 @@ jobs:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           run: npx semantic-release
 
+      # Wait for a few seconds to ensure the release is registered on GitHub
+        - name: Wait for GitHub to register the release
+          run: sleep 10
+
         - name: Get the latest release tag
           id: get_version
           run: echo "::set-output name=version::$(git describe --tags --abbrev=0)"
