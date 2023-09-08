@@ -10,7 +10,7 @@ permissions:
 
 jobs:
     Release:
-      name: Upload Release Asset
+      name: Use Semantic Release
       runs-on: ubuntu-latest
       environment:
         name: Production
@@ -30,5 +30,3 @@ jobs:
           env:
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           run: npx semantic-release
-
-            
