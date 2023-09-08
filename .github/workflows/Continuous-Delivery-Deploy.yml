@@ -35,10 +35,13 @@ jobs:
               
     Build-Docker-Image:
           runs-on: ubuntu-latest
+          env:
+            ECR_REPOSITORY: express
+            IMAGE_TAG: ${{ github.sha }}
           steps:
             - uses: actions/checkout@v2
             - name: Build docker image
-              run: docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+              run: docker build -t express:latest .
         
     Deploy-to-QA:
         name: Deploy to Quality Assurance
@@ -258,7 +261,8 @@ jobs:
             ECR_REPOSITORY: express
             IMAGE_TAG: ${{ github.sha }}
           run: |
-              docker push $ECR_REGISTRY/$ECR_REPOSITORY
+            docker tag express:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
                     
         - name: Update kube config
           run: aws eks update-kubeconfig --name eks-demo --region us-east-2
