@@ -2,59 +2,55 @@
 
 ## Descripción
 
-Esta es una aplicación demo basada en ExpressJS. Se diseñó para demostrar un flujo de trabajo CI/CD utilizando GitHub Actions y la implementación en un cluster EKS. 
+Esta es una aplicación demo basada en ExpressJS. Se diseñó para demostrar un flujo de trabajo CI/CD utilizando GitHub Actions, la integración con Semantic Release y la implementación en un cluster EKS.
 
 ## Estructura de la aplicación
 
 ### Código
 
 - **`src/server.js`**: Archivo principal que arranca la aplicación Express. La configuración por defecto es escuchar en el puerto `8080` y en el host `0.0.0.0`.
-- **`package.json`**: Contiene las dependencias del proyecto, así como scripts para iniciar, probar y construir la aplicación.
+- **`package.json`**: Contiene las dependencias del proyecto, así como scripts para iniciar, probar y construir la aplicación. Además, incluye la configuración necesaria para `semantic-release`.
 
 ### Configuración CI/CD
 
-- **GitHub Actions**: Se utilizan para definir flujos de trabajo de integración continua (CI) y despliegue continuo (CD). Los workflows se activan ante eventos específicos, por ejemplo, al abrir un Pull Request a la rama `develop`.
+- **GitHub Actions**: Se utilizan para definir flujos de trabajo de integración continua (CI) y despliegue continuo (CD). Los workflows se activan ante eventos específicos, por ejemplo, al hacer un `push` a la rama `main` o al disparar eventos personalizados.
+- **`release.yml`**: Define el flujo de trabajo para la generación automática de versiones con `semantic-release` y la creación de releases en GitHub.
 
 ### Docker
 
-- **`Dockerfile`**: Define cómo se debe construir la imagen Docker de la aplicación. 
+- **`Dockerfile`**: Define cómo se debe construir la imagen Docker de la aplicación.
+
+### Semantic Release
+
+Se integra `semantic-release` para la generación automática de versiones y changelogs basados en los mensajes de commit siguiendo las convenciones de [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
+- **`package.json`**:
+  - Sección "release": Define la configuración de `semantic-release`, incluyendo las ramas a monitorizar y los plugins utilizados.
+  - Dependencias: Se han añadido las dependencias necesarias para `semantic-release` y sus plugins.
 
 ### Despliegue en EKS
 
-Dentro del directorio `eks`, se encuentran archivos de configuración para desplegar la aplicación en diferentes entornos de un cluster EKS:
-
-- **`deployment-prd.yaml`**: Configuración de despliegue para producción.
-- **`deployment-qa.yaml`**: Configuración de despliegue para aseguramiento de calidad.
-- **`deployment-stg.yaml`**: Configuración de despliegue para entorno de staging.
-
-Además, se cuenta con servicios que exponen cada despliegue:
-
-- **`service-prd.yaml`**: Servicio para producción.
-- **`service-qa.yaml`**: Servicio para aseguramiento de calidad.
-- **`service-stg.yaml`**: Servicio para entorno de staging.
-
-Estos servicios utilizan un `LoadBalancer`, lo que permite que la aplicación sea accesible externamente.
+... *(El contenido relacionado con EKS permanece igual)* ...
 
 ## Uso básico
 
-1. **Instalación de dependencias**: 
-   ```sh
-   npm install
-2. **Construir la aplicación**: 
-   ```sh
-   npm run build
-3. **Ejecutar pruebas**: 
-   ```sh
-   npm test
-4. **Construir imagen Docker**: 
-   ```sh
-   docker build -t demo-helloapp .
+... *(El contenido de Uso básico permanece igual)* ...
 
 ## Contribución
 
-- Trabajar en la rama feature/* para cualquier nueva característica o corrección.
-- Una vez listo, crear un Pull Request hacia la rama develop.
-- Una vez aprobado el Pull Request, los flujos de trabajo de GitHub Actions se encargarán del proceso de CI/CD, incluyendo pruebas unitarias, construcción y despliegue en los diferentes entornos.
+... *(El contenido de Contribución permanece igual)* ...
+
+## Semantic Release
+
+Para facilitar la gestión de versiones y releases, esta aplicación utiliza `semantic-release`. Aquí hay un resumen de cómo funciona:
+
+1. Al hacer un `push` a la rama `main`, se activa el flujo de trabajo de GitHub Actions definido en `release.yml`.
+2. Se instalan las dependencias y se ejecuta `semantic-release`.
+3. `semantic-release` analiza los mensajes de commit para determinar el tipo de versión a generar (mayor, menor o parche).
+4. Se genera automáticamente un changelog y se crea un release en GitHub.
+5. Si todo va bien, se dispara un evento personalizado para manejar la creación de este nuevo release.
+
+Se recomienda seguir las convenciones de [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) al redactar mensajes de commit. Esto asegura que `semantic-release` pueda determinar correctamente la versión a generar.
 
 # Documentación del Flujo de Trabajo de Despliegue en EKS
 
