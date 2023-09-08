@@ -1,9 +1,6 @@
 name: Create Release
 on:
-  push:
-    branches:
-      - main
-      
+  push:      
   repository_dispatch:
     types: [create-release]
 
