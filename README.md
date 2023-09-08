@@ -14,6 +14,9 @@ Esta es una aplicación demo basada en ExpressJS. Se diseñó para demostrar un 
 ### Configuración CI/CD
 
 - **GitHub Actions**: Se utilizan para definir flujos de trabajo de integración continua (CI) y despliegue continuo (CD). Los workflows se activan ante eventos específicos, por ejemplo, al hacer un `push` a la rama `main` o al disparar eventos personalizados.
+- **`publish-build-as-artifact.yml`**: Define cómo se debe construir la aplicación y cómo publicarla como un artefacto en GitHub Actions.
+- **`Continuous-Integration.yml`**: Describe el proceso de integración continua, incluyendo la construcción y prueba de la aplicación.
+- **`Continuous-Delivery-Deploy.yml`**: Define el flujo de trabajo para el despliegue continuo de la aplicación.
 - **`release.yml`**: Define el flujo de trabajo para la generación automática de versiones con `semantic-release` y la creación de releases en GitHub.
 
 ### Docker
@@ -70,7 +73,7 @@ El flujo de trabajo se activa en los siguientes eventos:
 
 - **Plataforma**: `ubuntu-latest`.
 - Descarga el código del repositorio.
-- Configura Node.js v16.
+- Configura Node.js v18.
 - Instala dependencias con `npm ci`.
 - Ejecuta las pruebas unitarias con `npm test`.
 
@@ -118,6 +121,20 @@ Recopila y muestra información sobre los recursos desplegados en el ambiente de
 - Se ejecuta después de completarse `Deploy-to-Prod`.
 - Muestra detalles sobre los namespaces, deployments, services y pods en el namespace `production`.
 
+### 9. Publish Build as Artifact (Definido en `publish-build-as-artifact.yml`)
+
+Una vez que la aplicación se ha construido y probado con éxito, esta fase del flujo de trabajo la empaqueta y la publica como un artefacto en GitHub Actions. Esto permite que otros flujos de trabajo o partes interesadas puedan descargar y utilizar esa construcción específica.
+
+### 10. Continuous Integration (Definido en `Continuous-Integration.yml`)
+
+Abarca las fases de construcción y pruebas de la aplicación. Durante este proceso, la aplicación se construye y se ejecutan las pruebas unitarias y de integración para asegurarse de que todo funcione correctamente antes de pasar a la fase de despliegue.
+
+### 11. Continuous Delivery and Deploy (Definido en `Continuous-Delivery-Deploy.yml`)
+
+Tras la integración continua, este flujo de trabajo maneja el despliegue de la aplicación en diferentes ambientes. Define los pasos necesarios para llevar la aplicación desde el ambiente de desarrollo hasta producción.
+
+
+
 ## Conclusión
 
 Este flujo de trabajo proporciona una robusta pipeline de CI/CD, gestionando la construcción, prueba, y despliegue de una aplicación en diferentes ambientes de EKS. Además, maneja la construcción y subida de imágenes Docker a ECR y puede iniciar flujos de trabajo adicionales mediante eventos personalizados.
@@ -130,4 +147,5 @@ Este flujo de trabajo proporciona una robusta pipeline de CI/CD, gestionando la 
 - [AWS EKS Official Documentation](https://aws.amazon.com/eks/)
 - [Kubernetes Official Documentation](https://kubernetes.io/docs/home/)
 - [AWS ECR Official Documentation](https://aws.amazon.com/ecr/)
+- [Semantig Release Documentation](https://semantic-release.gitbook.io/semantic-release/)
 
