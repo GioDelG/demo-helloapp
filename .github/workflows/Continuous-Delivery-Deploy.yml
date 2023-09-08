@@ -301,8 +301,8 @@ jobs:
         if: success()
         # Define the platform to work in
         runs-on: ubuntu-latest
-#        environment:
-#          name: Production
+        environment:
+          name: Production
 
         steps:
         - name: Checkout code
