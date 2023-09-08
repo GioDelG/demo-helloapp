@@ -30,7 +30,7 @@ jobs:
             path: node_modules
             key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
             restore-keys: |
-              ${{ runner.OS }}-node-
+              ${{ runner.OS }}-node-18
     
         - run: npm ci
 
