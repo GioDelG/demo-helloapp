@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Esta es una aplicación demo basada en ExpressJS. Se diseñó para demostrar un flujo de trabajo CI/CD utilizando GitHub Actions, la integración con Semantic Release y la implementación en un cluster EKS.
+Esta es una aplicación demo basada en ExpressJS. Se diseñó para demostrar un flujo de trabajo CI/CD utilizando GitHub Actions, la integración con Semantic Release y la implementación en un cluster EKS de AWS.
 
 ## Estructura de la aplicación
 
@@ -30,27 +30,26 @@ Se integra `semantic-release` para la generación automática de versiones y cha
 
 ### Despliegue en EKS
 
-... *(El contenido relacionado con EKS permanece igual)* ...
+La aplicación se despliega en un cluster EKS de AWS mediante la definición de configuraciones específicas para cada ambiente (QA, Staging y Producción). Estas configuraciones están en los archivos `eks/deployment-qa.yaml`, `eks/deployment-stg.yaml` y `eks/deployment-prd.yaml` respectivamente.
 
 ## Uso básico
 
-... *(El contenido de Uso básico permanece igual)* ...
+1. Clonar el repositorio: `git clone https://github.com/GioDelG/demo-helloapp.git`
+2. Instalar las dependencias: `npm install`
+3. Iniciar la aplicación: `npm start`
 
 ## Contribución
 
-... *(El contenido de Contribución permanece igual)* ...
+Para contribuir al proyecto, por favor sigue los siguientes pasos:
+
+1. Haz un fork del repositorio.
+2. Crea una nueva rama con un nombre descriptivo.
+3. Haz tus cambios y asegúrate de seguir las convenciones de [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+4. Realiza una solicitud de pull al repositorio original.
 
 ## Semantic Release
 
-Para facilitar la gestión de versiones y releases, esta aplicación utiliza `semantic-release`. Aquí hay un resumen de cómo funciona:
-
-1. Al hacer un `push` a la rama `main`, se activa el flujo de trabajo de GitHub Actions definido en `release.yml`.
-2. Se instalan las dependencias y se ejecuta `semantic-release`.
-3. `semantic-release` analiza los mensajes de commit para determinar el tipo de versión a generar (mayor, menor o parche).
-4. Se genera automáticamente un changelog y se crea un release en GitHub.
-5. Si todo va bien, se dispara un evento personalizado para manejar la creación de este nuevo release.
-
-Se recomienda seguir las convenciones de [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) al redactar mensajes de commit. Esto asegura que `semantic-release` pueda determinar correctamente la versión a generar.
+Con la ayuda de `semantic-release`, el proceso de lanzamiento se ha automatizado por completo. Los nuevos lanzamientos y changelogs se generan automáticamente en base a los mensajes de commit. Es crucial seguir las convenciones de commit para que este proceso funcione correctamente.
 
 # Documentación del Flujo de Trabajo de Despliegue en EKS
 
@@ -92,38 +91,43 @@ Este job recopila y muestra información sobre los recursos desplegados en el am
 ### 4. Deploy-to-Stg
 
 Maneja el despliegue en el ambiente de Pre-Producción o Staging.
-- Se ejecuta después de `Build-Application-Tests` si el evento es un push a la rama `main`.
-- Realiza acciones similares al job de QA para desplegar los recursos definidos en `eks/deployment-stg.yaml` y `eks/service-stg.yaml`.
+- Se ejecuta si `Deploy-to-QA` y `QA-EKS-Values` se completan correctamente.
+- Despliega los recursos de Kubernetes definidos en `eks/deployment-stg.yaml` y `eks/service-stg.yaml`.
 
 ### 5. Stg-EKS-Values
 
-Al igual que el job de QA, recopila y muestra información pero del ambiente de Staging.
+Recopila y muestra información sobre los recursos desplegados en el ambiente de Staging.
+- Se ejecuta después de completarse `Deploy-to-Stg`.
 - Muestra detalles sobre los namespaces, deployments, services y pods en el namespace `staging`.
 
-### 6. Deploy-to-Prod
+### 6. Manual-Approval
 
-Gestiona el despliegue en el ambiente de Producción.
-- Se ejecuta después de completarse `Deploy-to-Stg`.
-- Realiza acciones similares a los jobs anteriores para desplegar los recursos definidos en `eks/deployment-prd.yaml` y `eks/service-prd.yaml`.
+Solicita aprobación manual para continuar con el despliegue en el ambiente de Producción.
+- Se presenta una pausa en el flujo de trabajo esperando la aprobación manual.
+- Una vez aprobado, el workflow continúa con el job `Deploy-to-Prod`.
 
-### 7. Image-to-ECR
+### 7. Deploy-to-Prod
 
-Construye una imagen Docker y la sube al Amazon ECR (Elastic Container Registry).
-- Se ejecuta después de `Deploy-to-Prod`.
-- Construye la imagen Docker y la etiqueta con el SHA del commit.
-- Se conecta al registro de ECR y sube la imagen.
+Maneja el despliegue en el ambiente de Producción.
+- Se ejecuta después de recibir aprobación en `Manual-Approval`.
+- Despliega los recursos de Kubernetes definidos en `eks/deployment-prd.yaml` y `eks/service-prd.yaml`.
 
 ### 8. Prod-EKS-Values
 
-Al igual que los jobs anteriores de valores EKS, recopila y muestra información pero del ambiente de Producción.
+Recopila y muestra información sobre los recursos desplegados en el ambiente de Producción.
+- Se ejecuta después de completarse `Deploy-to-Prod`.
 - Muestra detalles sobre los namespaces, deployments, services y pods en el namespace `production`.
-
-### 9. Trigger Create Release
-
-Si todo ha sido exitoso, este job dispara un evento personalizado `create-release` para posiblemente manejar la creación de un nuevo release en GitHub.
 
 ## Conclusión
 
 Este flujo de trabajo proporciona una robusta pipeline de CI/CD, gestionando la construcción, prueba, y despliegue de una aplicación en diferentes ambientes de EKS. Además, maneja la construcción y subida de imágenes Docker a ECR y puede iniciar flujos de trabajo adicionales mediante eventos personalizados.
 
-  
+## Links de Referencia:
+
+- [ExpressJS Official Documentation](https://expressjs.com/)
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)
+- [Docker Official Documentation](https://docs.docker.com/)
+- [AWS EKS Official Documentation](https://aws.amazon.com/eks/)
+- [Kubernetes Official Documentation](https://kubernetes.io/docs/home/)
+- [AWS ECR Official Documentation](https://aws.amazon.com/ecr/)
+
