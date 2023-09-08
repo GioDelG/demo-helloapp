@@ -261,8 +261,8 @@ jobs:
             ECR_REPOSITORY: express
             IMAGE_TAG: ${{ github.sha }}
           run: |
-            docker tag express:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-            docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+            docker tag express:latest $ECR_REGISTRY/$ECR_REPOSITORY
+            docker push $ECR_REGISTRY/$ECR_REPOSITORY
                     
         - name: Update kube config
           run: aws eks update-kubeconfig --name eks-demo --region us-east-2
