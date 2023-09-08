@@ -248,13 +248,28 @@ jobs:
             kubectl apply -f eks/service-prd.yaml
 
     Image-to-ECR:
-        name: Create Image to ECR
+        name: Docker Image to ECR
         needs: [Deploy-to-Prod]
         if: success()
         runs-on: ubuntu-latest
         environment:
           name: Production
         steps:
+
+        - name: Checkout code
+          uses: actions/checkout@v3
+
+        - name: Use Node.js 
+          uses: actions/setup-node@v2
+          with:
+            node-version: 16
+        - run: npm ci
+
+        - name: Install kubectl
+          uses: azure/setup-kubectl@v3
+          with:
+            version: 'v1.28.0'
+          id: install
 
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v3
@@ -286,8 +301,8 @@ jobs:
         if: success()
         # Define the platform to work in
         runs-on: ubuntu-latest
-        environment:
-          name: Production
+#        environment:
+#          name: Production
 
         steps:
         - name: Checkout code
