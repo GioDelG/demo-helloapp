@@ -40,7 +40,7 @@ jobs:
                 echo "::set-output name=new_version::$new_version"
           shell: bash
 
-        - name: Build project # This would actually build your project, using zip for an example artifact
+        - name: Build project # Build your project, using zip for an example artifact
           run: |
             zip --junk-paths hello-world README.md
 
