@@ -36,6 +36,10 @@ jobs:
                 minor_version=$(echo $latest_version | cut -d'.' -f3)
                 new_minor_version=$((minor_version + 1))
                 new_version="v${major_version}.${new_minor_version}.0"
+                while git rev-parse "$new_version" >/dev/null 2>&1; do
+                  new_minor_version=$((new_minor_version + 1))
+                  new_version="v${major_version}.${new_minor_version}.0"
+                done
               fi
                 echo "::set-output name=new_version::$new_version"
           shell: bash
