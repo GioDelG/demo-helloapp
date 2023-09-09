@@ -13,7 +13,7 @@ Esta aplicación demostrativa, construida sobre ExpressJS, sirve como una repres
 
 ### CI/CD Setup
 
-- **GitHub Actions**: Define los flujos de trabajo de CI/CD que se activan con ciertos eventos, como un `push` a `main`.
+- **GitHub Actions**: Define los flujos de trabajo de CI/CD que se activan con distintos eventos.
 - **Workflow Definitions**:
   - **`publish-build-as-artifact.yml`**: Construcción y publicación de la app como artefacto.
   - **`Continuous-Integration.yml`**: Gestión de la integración continua.
@@ -30,7 +30,7 @@ Esta aplicación demostrativa, construida sobre ExpressJS, sirve como una repres
 
 ### AWS EKS Deployment
 
-La aplicación se despliega en AWS EKS con configuraciones específicas para cada entorno: QA (`eks/deployment-qa.yaml`), Staging (`eks/deployment-stg.yaml`), y Producción (`eks/deployment-prd.yaml`).
+La aplicación se despliega en AWS EKS con configuraciones específicas para cada entorno. Entornos desplegados en diferente Namespaces como ambientes aislados, sacando provecho de las diferente utilizades que nos entrega k8s: QA (`eks/deployment-qa.yaml`), Staging (`eks/deployment-stg.yaml`), y Producción (`eks/deployment-prd.yaml`).
 
 ## Getting Started
 
@@ -57,20 +57,20 @@ Descripción del flujo de trabajo de GitHub Actions para CI/CD en EKS de AWS.
 
 - `push` a `main`.
 - `pull_request` a `main`.
-- Manual activation with `workflow_dispatch`.
+- Manual activation con `workflow_dispatch`.
 
 ### Workflow Steps
 #### **Continuous Integration**: Construcción y pruebas.
 1. **Build-Application-Tests**: Construcción y ejecución de pruebas en plataforma `ubuntu-latest`.
 2. **Publish Build as Artifact**: Publicación de la construcción como artefacto.
 #### **Continuous Delivery and Deploy**: Despliegue en diferentes ambientes.
-1. **Deploy-to-QA**: Despliegue en el ambiente QA.
-2. **QA-EKS-Values**: Información sobre recursos desplegados en QA.
-3. **Deploy-to-Stg**: Despliegue en el ambiente de Staging.
-4. **Stg-EKS-Values**: Información sobre recursos en Staging.
-5. **Manual-Approval**: Aprobación manual para producción.
-6. **Deploy-to-Prod**: Despliegue en producción.
-7. **Prod-EKS-Values**: Información sobre recursos en Producción.
+3. **Deploy-to-QA**: Despliegue en el ambiente QA.
+4. **QA-EKS-Values**: Información sobre recursos desplegados en QA.
+5. **Deploy-to-Stg**: Despliegue en el ambiente de Staging.
+6. **Stg-EKS-Values**: Información sobre recursos en Staging.
+7. **Manual-Approval**: Aprobación manual para producción.
+8. **Deploy-to-Prod**: Despliegue en producción.
+9. **Prod-EKS-Values**: Información sobre recursos en Producción.
 
 
 
