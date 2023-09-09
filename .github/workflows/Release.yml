@@ -1,34 +1,43 @@
+# Define el nombre del workflow
 name: Create Release
+# Este workflow se dispara cuando se envía un evento personalizado 'create-release' a repository_dispatch
 on:
   repository_dispatch:
     types: [create-release]
-
+# Establece los permisos para el workflow
 permissions:
+    # Otorga permisos de escritura para el token de ID de GitHub
     id-token: write
+    # Otorga permisos de escritura para los contenidos del repositorio
     contents: write
+    # Otorga permisos de escritura para los paquetes de GitHub
     packages: write
 
 jobs:
     Release:
-      name: Upload Release Asset
+      # Nombre del workflow que se mostrará en la pestaña de acciones
+      name: Use Semantic Release
+      # Define el tipo de runner en el que se ejecutará el workflow
       runs-on: ubuntu-latest
+      # Establece el contexto del entorno
       environment:
         name: Production
+      # Define la secuencia de tareas (pasos) que se ejecutarán en el job
       steps:
+        # Realiza el checkout del repositorio en $GITHUB_WORKSPACE, permitiendo al job acceder a él
         - name: Checkout code
           uses: actions/checkout@v3
-
+         # Configura una versión específica de Node.js en el runner
         - name: Setup Node.js
           uses: actions/setup-node@v2
           with:
             node-version: 18
-  
+        # Instala las dependencias npm del proyecto
         - name: Install dependencies
           run: npm ci
-
+        # Utiliza semantic-release para automatizar la gestión de versiones y la publicación de paquetes
         - name: Semantic Release
           env:
+              # Utiliza el token de GitHub para autenticación
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           run: npx semantic-release
-
-            

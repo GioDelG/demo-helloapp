@@ -1,29 +1,31 @@
+# Nombre del flujo de trabajo
 name: Deploy app on EKS
+# Eventos que activan el workflow
 on:
     push:
         branches: [main]
     pull_request:
         branches: [main]
     workflow_dispatch:
-
+# Permisos requeridos para el workflow
 permissions:
     id-token: write
     contents: write
     packages: write
-          
+# Jobs del flujo del workflow         
 jobs:
-
+# Prepara el caché y las dependencias
     Setup-Cache-Dependencies:
         runs-on: ubuntu-latest
         steps:
         - name: Checkout code
           uses: actions/checkout@v3
-
+        # Configuración de Node.js
         - name: Use Node.js 
           uses: actions/setup-node@v2
           with:
             node-version: 18
-
+        # Caché de los node_modules
         - name: Cache node modules
           uses: actions/cache@v2
           with:
@@ -31,47 +33,50 @@ jobs:
             key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
             restore-keys: |
               ${{ runner.OS }}-node-18-
+        # Instalación de dependencias
         - run: npm ci
-
+    # Construye la aplicación y aplica pruebas
     Build-Application-Tests:
         runs-on: ubuntu-latest
+        
         steps:
-          
-            # Checkout your code into the container
+
             - uses: actions/checkout@v3
               with:
-                # Making a pull_request on develop: Download the code from feature branch
+                # Realizar un pull_request a 'develop': Descarga el codigo de la rama feature
                 ref: ${{ github.event.pull_request.head.sha }}
-            # Setup node and npm to your path
+
             - name: Use Node.js 
               uses: actions/setup-node@v2
               with:
                 node-version: 18
-            # Runs clean install of npm for automated environments
+
             - run: npm ci
-            # Run tests
+
             - name: Ejecutar pruebas
               run: npm test
-        
+    # Despliegue en el ambiente de QA 
     Deploy-to-QA:
         name: Deploy to Quality Assurance
+        # Dependencias. Este job depende de la finalización exitosa de estos dos jobs.
         needs: [Setup-Cache-Dependencies, Build-Application-Tests]
         if: github.event_name == 'pull_request'
-        # Define the platform to work in
+        # Sistema operativo en el que se ejecutará el trabajo.
         runs-on: ubuntu-latest
         environment:
+            # Nombre del entorno donde se desplegará la aplicación.
             name: Development
-
         steps:
+        # Obtener el código fuente del repositorio.
         - name: Checkout code
           uses: actions/checkout@v3
-
+        # Instalar kubectl, herramienta de línea de comandos de Kubernetes.
         - name: Install kubectl
           uses: azure/setup-kubectl@v3
           with:
             version: 'v1.28.0'
           id: install
-
+        # Configura las credenciales de Amazon AWS para permitir la interacción con el servicio.
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v3
           with:
@@ -80,25 +85,25 @@ jobs:
             aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
             role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
             role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-    
+        # Actualizar la configuración de kubectl para interactuar con el clúster EKS.
         - name: Update kube config
           run: aws eks update-kubeconfig --name eks-demo --region us-east-2
-      
+        # Desplegar la aplicación en EKS usando los archivos de configuración.
         - name: Deploy to EKS
           run: |
               kubectl apply -f eks/deployment-qa.yaml
               kubectl apply -f eks/service-qa.yaml
-
+    # Obtener valores de EKS para el ambiente de QA
     QA-EKS-Values:
         name: Get QA Kubernetes Values
         needs: [Setup-Cache-Dependencies, Deploy-to-QA]
         if: success()
-        # Define the platform to work in
         runs-on: ubuntu-latest
         environment:
           name: Development
 
         steps:
+          
         - name: Checkout code
           uses: actions/checkout@v3
 
@@ -107,7 +112,7 @@ jobs:
           with:
             version: 'v1.28.0'
           id: install
-      
+
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v3
           with:
@@ -126,18 +131,17 @@ jobs:
               kubectl get deployment -n quality-assurance -o wide
               kubectl get service -n quality-assurance
               kubectl get pods -o wide -n quality-assurance
-    
-
+    # Despliegue en el ambiente de Staging
     Deploy-to-Stg:
         name: Deploy to Staging
         needs: [Setup-Cache-Dependencies, Build-Application-Tests]
         if: github.event.ref == 'refs/heads/main'
-        # Define the platform to work in
         runs-on: ubuntu-latest
         environment:
             name: Staging
-        
+
         steps:
+
         - name: Checkout code
           uses: actions/checkout@v3
 
@@ -146,7 +150,7 @@ jobs:
           with:
             version: 'v1.28.0'
           id: install
-            
+
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v3
           with:
@@ -155,25 +159,25 @@ jobs:
             aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
             role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
             role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-            
+
         - name: Update kube config
           run: aws eks update-kubeconfig --name eks-demo --region us-east-2
-              
+
         - name: Deploy to EKS
           run: |
             kubectl apply -f eks/deployment-stg.yaml
             kubectl apply -f eks/service-stg.yaml
-
+    # Obtener valores de EKS para el ambiente de Staging
     Stg-EKS-Values:
         name: Get Stg Kubernetes Values
         needs: [Setup-Cache-Dependencies, Deploy-to-Stg]
         if: success()
-        # Define the platform to work in
         runs-on: ubuntu-latest
         environment:
           name: Staging
 
         steps:
+
         - name: Checkout code
           uses: actions/checkout@v3
 
@@ -182,7 +186,7 @@ jobs:
           with:
             version: 'v1.28.0'
           id: install
-      
+
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v3
           with:
@@ -201,16 +205,16 @@ jobs:
               kubectl get deployment -n staging -o wide
               kubectl get service -n staging
               kubectl get pods -o wide -n staging
-
+    # Despliegue en el ambiente de Producción
     Deploy-to-Prod:
         name: Deploy to Production
         needs: [Setup-Cache-Dependencies, Deploy-to-Stg]
-        # Define the platform to work in
         runs-on: ubuntu-latest
         environment:
                 name: Production
-                
+
         steps:
+
         - name: Checkout code
           uses: actions/checkout@v3
 
@@ -219,7 +223,7 @@ jobs:
           with:
             version: 'v1.28.0'
           id: install
-                    
+
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v3
           with:
@@ -228,15 +232,15 @@ jobs:
             aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
             role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
             role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-                    
+
         - name: Update kube config
           run: aws eks update-kubeconfig --name eks-demo --region us-east-2
-                      
+
         - name: Deploy to EKS
           run: |
             kubectl apply -f eks/deployment-prd.yaml
             kubectl apply -f eks/service-prd.yaml
-
+    # Push de la imagen Docker al registro ECR  
     Image-to-ECR:
         name: Docker Image to ECR
         needs: [Setup-Cache-Dependencies, Deploy-to-Prod]
@@ -244,7 +248,9 @@ jobs:
         runs-on: ubuntu-latest
         environment:
           name: Production
+
         steps:
+
         - name: Checkout code
           uses: actions/checkout@v3
 
@@ -262,32 +268,38 @@ jobs:
             aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
             role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
             role-session-name: ${{ secrets.AWS_ROLE_SESSION_NAME }}
-
+        # Iniciar sesión en el Amazon ECR para poder subir imágenes Docker
         - name: Login to Amazon ECR
           id: login-ecr
           uses: aws-actions/amazon-ecr-login@v1
           with:
+            # Enmascara la contraseña en los logs por razones de seguridad
             mask-password: 'true'
-                    
+        # Etiquetar y subir la imagen Docker al ECR  
         - name: Tag, and push docker image to Amazon ECR
           env:
+             # Dirección del registro ECR.
             ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+            # Nombre del repositorio.
             ECR_REPOSITORY: express
+            # Etiqueta de la imagen basada en el SHA del commit
             IMAGE_TAG: ${{ github.sha }}
           run: |
+                # Construir la imagen Docker con la etiqueta "latest".
                 docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+                # Subir la imagen al Amazon ECR.
                 docker push $ECR_REGISTRY/$ECR_REPOSITORY
-
+# Obtener valores de EKS para el ambiente de Producción
     Prod-EKS-Values:
         name: Get Prod Kubernetes Values
         needs: [Setup-Cache-Dependencies, Deploy-to-Prod]
         if: success()
-        # Define the platform to work in
         runs-on: ubuntu-latest
         environment:
           name: Production
 
         steps:
+
         - name: Checkout code
           uses: actions/checkout@v3
 
@@ -296,7 +308,7 @@ jobs:
           with:
             version: 'v1.28.0'
           id: install
-      
+
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v3
           with:
@@ -316,7 +328,7 @@ jobs:
               kubectl get service -n production
               kubectl get pods -o wide -n production
 
-# Call workflow: "create release"
+# Llamada al workflow de tipo evento: create-release para la creación de una release
         - name: trigger create release
           if: success()
           uses: peter-evans/repository-dispatch@v2
@@ -325,4 +337,3 @@ jobs:
             repository: ${{ github.repository }}
             event-type: create-release
             client-payload: '{ "base_branch": "${{ github.base_ref }}" }'
-            #
