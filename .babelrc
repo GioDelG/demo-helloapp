@@ -1,3 +1,6 @@
+// Este fichero básicamente indica que Babel debe utilizar el preset 
+// @babel/preset-env para transformar el código JavaScript moderno en una versión 
+// que sea compatible con la mayoría de los navegadores o entornos.
 {
     "presets": ["@babel/preset-env"]
   }

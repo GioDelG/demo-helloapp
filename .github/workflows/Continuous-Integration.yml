@@ -1,62 +1,72 @@
+# Define el nombre del workflow
 name: Build and Test Feature Branch
+# Especifica cuándo se ejecutará el workflow (en este caso, cuando se haga un pull request a la rama 'develop')
 on:
   pull_request:
       branches: [ develop ]
       types: [ opened, reopened ]
-
+# Define los trabajos que se llevarán a cabo durante la ejecución del workflow
 jobs:
     Source-Build:
-        # Define the platform to work in
+        # Define la plataforma a utilizar (ubuntu-latest)
         runs-on: ubuntu-latest
         steps:
-            # Checkout your code into the container
+            # Descarga el código en el contenedor
             - uses: actions/checkout@v3
               with:
-                ref: ${{ github.event.pull_request.head.sha }} # Making a pull_request on develop: Download the code from feature branch
+                # Realizar un pull_request a 'develop': Descarga el codigo de la rama feature
+                ref: ${{ github.event.pull_request.head.sha }}
+            # Configura Node.js
             - name: Setup Node.js/npm to your path 
               uses: actions/setup-node@v3
               with:
                 node-version: 18
+            # Realiza una instalación limpia de las dependencias
             - name: Clean Install for automated envs
               run: npm ci
-
-# Runs unit tests
+# Ejecuta las pruebas unitarias
     Unit-Tests:
       runs-on: ubuntu-latest
       needs: Source-Build
       if: ${{ success() }}
+
       steps:
+
           - name: Checkout Code
             uses: actions/checkout@v3
             with:
-              ref: ${{ github.event.pull_request.head.sha }} # Making a pull_request on develop: Download the code from feature branch
+              # Descarga el código asociado con el último commit del pull request actual
+              ref: ${{ github.event.pull_request.head.sha }}
+
           - name: Setup Node.js/npm to your path 
             uses: actions/setup-node@v3
             with:
               node-version: 18
+        
           - name: Clean Install
             run: npm ci
+          # Ejecuta las pruebas unitarias
           - name: Execute Tests
             run: npm test
 
-# Automatic merge to develop branch
-    # Execute only if the previos job ended succesfully
+# Merge automático a la rama 'develop'
     merge-feature-into-develop:
       runs-on: ubuntu-latest
+      # Se ejecuta solo si el job anterior terminó exitoso
       needs: Unit-Tests
       if: ${{ success() }}
-# Modify permissions for content and pull-request on GITHUB_TOKEN for push changes
+      # Modifica los permisos para contenido y pull requests en GITHUB_TOKEN para hacer cambios
       permissions:
         contents: write
         pull-requests: write
       steps:
-# Dowload the code from destination branch (develop) | fetch-depth: 0 to fech all history for all branches
+# Descarga el código de la rama destino ('develop') 
         - uses: actions/checkout@v3
           with:
             ref: ${{ github.base_ref }}
+            # Busca todo el historial de todas las ramas
             fetch-depth: 0
-
-# Merge to develop branch if previos jobs ended succesfully
+# Merge a la rama 'develop' si los jobs anteriores finalizaron correctamente
         - name: Merge to development branch
           if: ${{ success() }}
           run: |
@@ -65,15 +75,14 @@ jobs:
             #Using -m "mesage" on merge command ins mandatori here in order to avoid open a text editor to write a commit message
             git merge --no-ff --verbose origin/${{ github.event.pull_request.head.ref }} -m "Merge pull request #${{ github.event.number }}"
 
-# Push changes after merge if previos jobs ended succesfully
+# Realiza push de los cambios después del merge
         - name: Push changes after merge
           if: ${{ success() }}
           uses: ad-m/github-push-action@master
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
             branch: ${{ github.base_ref }}
-
-# Call workflow: "publish-build-as-artifact"
+# Llama al workflow: "publish-build-as-artifact"
         - name: trigger deploy artifact
           if: success()
           uses: peter-evans/repository-dispatch@v2
@@ -81,4 +90,5 @@ jobs:
             token: ${{ secrets.GITHUB_TOKEN }}
             repository: ${{ github.repository }}
             event-type: publish-artifact-event
-            client-payload: '{ "base_branch": "${{ github.base_ref }}" }' # Send the name of the base branch used in this workflow (develop)
+            # Envía el nombre de la rama base utilizada en este workflow ('develop')
+            client-payload: '{ "base_branch": "${{ github.base_ref }}" }'
