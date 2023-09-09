@@ -117,3 +117,17 @@ Esta pipeline de CI/CD asegura un flujo de trabajo robusto desde la construcció
   - [Continuous Deployment Overview](https://www.atlassian.com/continuous-delivery/principles/continuous-integration-vs-delivery-vs-deployment)
 
 
+```
+
+
+  __  __           _        ____           _____ _          __  
+ |  \/  |         | |      |  _ \         / ____(_)         \ \ 
+ | \  / | __ _  __| | ___  | |_) |_   _  | |  __ _  ___    (_) |
+ | |\/| |/ _` |/ _` |/ _ \ |  _ <| | | | | | |_ | |/ _ \     | |
+ | |  | | (_| | (_| |  __/ | |_) | |_| | | |__| | | (_) |   _| |
+ |_|  |_|\__,_|\__,_|\___| |____/ \__, |  \_____|_|\___(_) (_) |
+                                   __/ |                    /_/ 
+                                  |___/                         
+
+
+```
