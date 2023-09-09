@@ -1,45 +1,49 @@
-name: Publish Node.js Build as Artifact 
+#Define el nombre del Workflow
+name: Publish Node.js Build as Artifact
+# Especifica cuándo se ejecutará el workflow (cuando se reciba un "repository_dispatch" de tipo "publish-artifact-event")
 on:
   repository_dispatch:
     types: [publish-artifact-event]
+# Define los trabajos que se llevarán a cabo durante la ejecución del workflow
 jobs:
   download-artifact-job:
+    # Especifica en qué entorno se ejecutará el job (en este caso, una máquina virtual con ubuntu-latest)
     runs-on: ubuntu-latest
     env:
       ARTIFACT_NAME: 'server.js'
+    # Define los permisos que necesita el workflow
     permissions:
       contents: write
       pull-requests: write
       
     steps:
-# Show the base branch from "build-feature" workflow for Debug pruposes      
+      # Muestra la rama base del workflow "build-feature" con fines de depuración
       - name: Debug Payload
         run: |     
          echo ${{ github.event.client_payload.base_branch }}
 
-# Download source code from default branch in order to retrive Dockerfile, and upload it as docker build context      
+      # Descarga el código fuente de la rama por defecto para recuperar Dockerfile, y luego lo sube como contexto de construcción de Docker
       - uses: actions/checkout@v3  
         with:
-          # Get the base branch from build-feature workflow
+          # Obtener la rama base del workflow "build-feature"
           ref: ${{ github.event.client_payload.base_branch }}
           fetch-depth: 0
-
-# Show the two last commits of the branch for debug pruposes
+      # Muestra los dos últimos commits de la rama con fines de depuración
       - name: check last hashid
         run: |
           git log -2
-
-# Setup Node.js and check that the source code is buildable
+      # Configura Node.js y verifica que el código fuente se pueda construir
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
+
       - name: Install Dependencies
         run: npm ci
+        
       - name: Build Project
         run: npm run build
-
-# Publish it as an artifact
+      # Publica el directorio como un artefacto
       - name: Publish Dir Directory
         if: success()
         uses: actions/upload-artifact@v3
