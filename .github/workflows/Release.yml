@@ -1,5 +1,5 @@
 # Define el nombre del workflow
-name: Create Release
+name: Semantic Release
 # Este workflow se dispara cuando se envía un evento personalizado 'create-release' a repository_dispatch
 on:
   repository_dispatch:
