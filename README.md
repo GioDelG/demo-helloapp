@@ -116,7 +116,7 @@ Esta pipeline de CI/CD asegura un flujo de trabajo robusto desde la construcció
   - [Continuous Integration (Martin Fowler)](https://martinfowler.com/articles/continuousIntegration.html)
   - [Continuous Deployment Overview](https://www.atlassian.com/continuous-delivery/principles/continuous-integration-vs-delivery-vs-deployment)
 
-
+---
 ```
 
 
