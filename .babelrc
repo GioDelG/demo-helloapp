@@ -4,4 +4,3 @@
 {
     "presets": ["@babel/preset-env"]
   }
-  

@@ -1,151 +1,133 @@
-# Demo Hello World App
+# Hello-World App on EKS Demo
 
-## Descripción
+## Overview
 
-Esta es una aplicación demo basada en ExpressJS. Se diseñó para demostrar un flujo de trabajo CI/CD utilizando GitHub Actions, la integración con Semantic Release y la implementación en un cluster EKS de AWS.
+Esta aplicación demostrativa, construida sobre ExpressJS, sirve como una representación de cómo implementar un flujo de trabajo CI/CD utilizando GitHub Actions, la integración con Semantic Release y el despliegue en un cluster EKS de AWS.
 
-## Estructura de la aplicación
+## Application Structure
 
-### Código
+### Codebase
 
-- **`src/server.js`**: Archivo principal que arranca la aplicación Express. La configuración por defecto es escuchar en el puerto `8080` y en el host `0.0.0.0`.
-- **`package.json`**: Contiene las dependencias del proyecto, así como scripts para iniciar, probar y construir la aplicación. Además, incluye la configuración necesaria para `semantic-release`.
+- **`src/server.js`**: Archivo principal que arranca la aplicación Express. Por defecto, escucha en el puerto `8080` y en el host `0.0.0.0`.
+- **`package.json`**: Define las dependencias y scripts del proyecto y configura `semantic-release`.
 
-### Configuración CI/CD
+### CI/CD Setup
 
-- **GitHub Actions**: Se utilizan para definir flujos de trabajo de integración continua (CI) y despliegue continuo (CD). Los workflows se activan ante eventos específicos, por ejemplo, al hacer un `push` a la rama `main` o al disparar eventos personalizados.
-- **`publish-build-as-artifact.yml`**: Define cómo se debe construir la aplicación y cómo publicarla como un artefacto en GitHub Actions.
-- **`Continuous-Integration.yml`**: Describe el proceso de integración continua, incluyendo la construcción y prueba de la aplicación.
-- **`Continuous-Delivery-Deploy.yml`**: Define el flujo de trabajo para el despliegue continuo de la aplicación.
-- **`release.yml`**: Define el flujo de trabajo para la generación automática de versiones con `semantic-release` y la creación de releases en GitHub.
+- **GitHub Actions**: Define los flujos de trabajo de CI/CD que se activan con distintos eventos.
+- **Workflow Definitions**:
+  - **`publish-build-as-artifact.yml`**: Construcción y publicación de la app como artefacto.
+  - **`Continuous-Integration.yml`**: Gestión de la integración continua.
+  - **`Continuous-Delivery-Deploy.yml`**: Flujo de despliegue.
+  - **`release.yml`**: Generación automática de versiones con `semantic-release`.
 
-### Docker
+### Dockerization
 
-- **`Dockerfile`**: Define cómo se debe construir la imagen Docker de la aplicación.
+- **`Dockerfile`**: Instrucciones para construir la imagen Docker.
 
-### Semantic Release
+### Semantic Versioning
 
-Se integra `semantic-release` para la generación automática de versiones y changelogs basados en los mensajes de commit siguiendo las convenciones de [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+`semantic-release` automatiza la generación de versiones y changelogs basándose en las convenciones de [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
-- **`package.json`**:
-  - Sección "release": Define la configuración de `semantic-release`, incluyendo las ramas a monitorizar y los plugins utilizados.
-  - Dependencias: Se han añadido las dependencias necesarias para `semantic-release` y sus plugins.
+### AWS EKS Deployment
 
-### Despliegue en EKS
+La aplicación se despliega en AWS EKS con configuraciones específicas para cada entorno. Entornos desplegados en diferente Namespaces como ambientes aislados, sacando provecho de las diferente utilizades que nos entrega k8s: QA (`eks/deployment-qa.yaml`), Staging (`eks/deployment-stg.yaml`), y Producción (`eks/deployment-prd.yaml`).
 
-La aplicación se despliega en un cluster EKS de AWS mediante la definición de configuraciones específicas para cada ambiente (QA, Staging y Producción). Estas configuraciones están en los archivos `eks/deployment-qa.yaml`, `eks/deployment-stg.yaml` y `eks/deployment-prd.yaml` respectivamente.
-
-## Uso básico
+## Getting Started
 
 1. Clonar el repositorio: `git clone https://github.com/GioDelG/demo-helloapp.git`
-2. Instalar las dependencias: `npm install`
+2. Instalar dependencias: `npm install`
 3. Iniciar la aplicación: `npm start`
 
-## Contribución
+## Contributing
 
-Para contribuir al proyecto, por favor sigue los siguientes pasos:
+Para colaborar:
 
-1. Haz un fork del repositorio.
-2. Crea una nueva rama con un nombre descriptivo.
-3. Haz tus cambios y asegúrate de seguir las convenciones de [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
-4. Realiza una solicitud de pull al repositorio original.
+1. Fork del repositorio.
+2. Crea una rama con un nombre descriptivo.
+3. Realiza tus cambios siguiendo [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+4. Abre una pull request al repositorio principal.
 
-## Semantic Release
+## Deployment Workflow Documentation
 
-Con la ayuda de `semantic-release`, el proceso de lanzamiento se ha automatizado por completo. Los nuevos lanzamientos y changelogs se generan automáticamente en base a los mensajes de commit. Es crucial seguir las convenciones de commit para que este proceso funcione correctamente.
+### Summary
 
-# Documentación del Flujo de Trabajo de Despliegue en EKS
+Descripción del flujo de trabajo de GitHub Actions para CI/CD en EKS de AWS.
 
-## Resumen
+### Trigger Events
 
-Este documento describe el flujo de trabajo (workflow) de GitHub Actions que maneja la integración continua (CI) y la entrega continua (CD) para una aplicación en EKS (Elastic Kubernetes Service) de AWS.
+- `push` a `main`.
+- `pull_request` a `main`.
+- Manual activation con `workflow_dispatch`.
 
-## Eventos de activación
-
-El flujo de trabajo se activa en los siguientes eventos:
-- `push` a la rama `main`.
-- Apertura o sincronización de `pull_request` hacia la rama `main`.
-- Manualmente mediante `workflow_dispatch`.
-
-## Jobs del Workflow
-
-### 1. Build-Application-Tests
-
-- **Plataforma**: `ubuntu-latest`.
-- Descarga el código del repositorio.
-- Configura Node.js v18.
-- Instala dependencias con `npm ci`.
-- Ejecuta las pruebas unitarias con `npm test`.
-
-### 2. Deploy-to-QA
-
-Este job se encarga del despliegue en el ambiente de Control de Calidad (QA).
-- Se ejecuta después de completarse `Build-Application-Tests`.
-- Instala y configura `kubectl` para interactuar con el cluster de Kubernetes.
-- Configura las credenciales de AWS y actualiza el `kubeconfig`.
-- Despliega los recursos de Kubernetes definidos en `eks/deployment-qa.yaml` y `eks/service-qa.yaml`.
-
-### 3. QA-EKS-Values
-
-Este job recopila y muestra información sobre los recursos desplegados en el ambiente de QA.
-- Se ejecuta después de completarse `Deploy-to-QA`.
-- Muestra detalles sobre los namespaces, deployments, services y pods en el namespace `quality-assurance`.
-
-### 4. Deploy-to-Stg
-
-Maneja el despliegue en el ambiente de Pre-Producción o Staging.
-- Se ejecuta si `Deploy-to-QA` y `QA-EKS-Values` se completan correctamente.
-- Despliega los recursos de Kubernetes definidos en `eks/deployment-stg.yaml` y `eks/service-stg.yaml`.
-
-### 5. Stg-EKS-Values
-
-Recopila y muestra información sobre los recursos desplegados en el ambiente de Staging.
-- Se ejecuta después de completarse `Deploy-to-Stg`.
-- Muestra detalles sobre los namespaces, deployments, services y pods en el namespace `staging`.
-
-### 6. Manual-Approval
-
-Solicita aprobación manual para continuar con el despliegue en el ambiente de Producción.
-- Se presenta una pausa en el flujo de trabajo esperando la aprobación manual.
-- Una vez aprobado, el workflow continúa con el job `Deploy-to-Prod`.
-
-### 7. Deploy-to-Prod
-
-Maneja el despliegue en el ambiente de Producción.
-- Se ejecuta después de recibir aprobación en `Manual-Approval`.
-- Despliega los recursos de Kubernetes definidos en `eks/deployment-prd.yaml` y `eks/service-prd.yaml`.
-
-### 8. Prod-EKS-Values
-
-Recopila y muestra información sobre los recursos desplegados en el ambiente de Producción.
-- Se ejecuta después de completarse `Deploy-to-Prod`.
-- Muestra detalles sobre los namespaces, deployments, services y pods en el namespace `production`.
-
-### 9. Publish Build as Artifact (Definido en `publish-build-as-artifact.yml`)
-
-Una vez que la aplicación se ha construido y probado con éxito, esta fase del flujo de trabajo la empaqueta y la publica como un artefacto en GitHub Actions. Esto permite que otros flujos de trabajo o partes interesadas puedan descargar y utilizar esa construcción específica.
-
-### 10. Continuous Integration (Definido en `Continuous-Integration.yml`)
-
-Abarca las fases de construcción y pruebas de la aplicación. Durante este proceso, la aplicación se construye y se ejecutan las pruebas unitarias y de integración para asegurarse de que todo funcione correctamente antes de pasar a la fase de despliegue.
-
-### 11. Continuous Delivery and Deploy (Definido en `Continuous-Delivery-Deploy.yml`)
-
-Tras la integración continua, este flujo de trabajo maneja el despliegue de la aplicación en diferentes ambientes. Define los pasos necesarios para llevar la aplicación desde el ambiente de desarrollo hasta producción.
+### Workflow Steps
+#### **Continuous Integration**: Construcción y pruebas.
+1. **Build-Application-Tests**: Construcción y ejecución de pruebas en plataforma `ubuntu-latest`.
+2. **Publish Build as Artifact**: Publicación de la construcción como artefacto.
+#### **Continuous Delivery and Deploy**: Despliegue en diferentes ambientes.
+3. **Deploy-to-QA**: Despliegue en el ambiente QA.
+4. **QA-EKS-Values**: Información sobre recursos desplegados en QA.
+5. **Deploy-to-Stg**: Despliegue en el ambiente de Staging.
+6. **Stg-EKS-Values**: Información sobre recursos en Staging.
+7. **Manual-Approval**: Aprobación manual para producción.
+8. **Deploy-to-Prod**: Despliegue en producción.
+9. **Prod-EKS-Values**: Información sobre recursos en Producción.
 
 
 
-## Conclusión
+### Conclusion
 
-Este flujo de trabajo proporciona una robusta pipeline de CI/CD, gestionando la construcción, prueba, y despliegue de una aplicación en diferentes ambientes de EKS. Además, maneja la construcción y subida de imágenes Docker a ECR y puede iniciar flujos de trabajo adicionales mediante eventos personalizados.
+Esta pipeline de CI/CD asegura un flujo de trabajo robusto desde la construcción hasta el despliegue en ambientes EKS, complementado con la creación y gestión de imágenes Docker en ECR.
 
-## Links de Referencia:
+## References:
 
-- [ExpressJS Official Documentation](https://expressjs.com/)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [Docker Official Documentation](https://docs.docker.com/)
-- [AWS EKS Official Documentation](https://aws.amazon.com/eks/)
-- [Kubernetes Official Documentation](https://kubernetes.io/docs/home/)
-- [AWS ECR Official Documentation](https://aws.amazon.com/ecr/)
-- [Semantig Release Documentation](https://semantic-release.gitbook.io/semantic-release/)
+- **ExpressJS**:
+  - [ExpressJS Official Documentation](https://expressjs.com/)
 
+- **GitHub**:
+  - [GitHub Official Documentation](https://docs.github.com/)
+  - [GitHub Actions Documentation](https://docs.github.com/en/actions)
+  - [GitHub Flow Guide](https://guides.github.com/introduction/flow/)
+
+- **Conventional Commits**:
+  - [Conventional Commits Official](https://www.conventionalcommits.org/en/v1.0.0/)
+  - [Conventional Commits 1.0.0 Specification](https://www.conventionalcommits.org/en/v1.0.0/#specification)
+
+- **Docker**:
+  - [Docker Official Documentation](https://docs.docker.com/)
+  - [Docker Compose Official Documentation](https://docs.docker.com/compose/)
+
+- **Node.js & npm**:
+  - [Node.js Official Documentation](https://nodejs.org/en/docs/)
+  - [npm Official Documentation](https://docs.npmjs.com/)
+
+- **AWS**:
+  - [AWS Official Documentation](https://docs.aws.amazon.com/)
+  - [AWS EKS Official Documentation](https://aws.amazon.com/eks/)
+  - [AWS ECR Official Documentation](https://aws.amazon.com/ecr/)
+  - [AWS CLI Documentation](https://aws.amazon.com/cli/)
+
+- **Kubernetes**:
+  - [Kubernetes Official Documentation](https://kubernetes.io/docs/home/)
+
+- **Semantic Release**:
+  - [Semantic Release Documentation](https://semantic-release.gitbook.io/semantic-release/)
+
+- **Continuous Integration/Continuous Deployment**:
+  - [Continuous Integration (Martin Fowler)](https://martinfowler.com/articles/continuousIntegration.html)
+  - [Continuous Deployment Overview](https://www.atlassian.com/continuous-delivery/principles/continuous-integration-vs-delivery-vs-deployment)
+
+---
+```
+
+
+  __  __           _        ____           _____ _          __  
+ |  \/  |         | |      |  _ \         / ____(_)         \ \ 
+ | \  / | __ _  __| | ___  | |_) |_   _  | |  __ _  ___    (_) |
+ | |\/| |/ _` |/ _` |/ _ \ |  _ <| | | | | | |_ | |/ _ \     | |
+ | |  | | (_| | (_| |  __/ | |_) | |_| | | |__| | | (_) |   _| |
+ |_|  |_|\__,_|\__,_|\___| |____/ \__, |  \_____|_|\___(_) (_) |
+                                   __/ |                    /_/ 
+                                  |___/                         
+
+
+```

@@ -12,4 +12,3 @@ COPY src/server.js .
 ENV PORT=8080
 # Define el comando que se ejecutará cuando se inicie el contenedor. En este caso, ejecuta la aplicación usando Node.js
 CMD ["node", "server.js"]
-
